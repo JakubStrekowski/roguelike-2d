@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerCharacter : MonoBehaviour
+public class PlayerCharacter : Character
 {
     // Start is called before the first frame update
     void Start()
@@ -14,5 +14,16 @@ public class PlayerCharacter : MonoBehaviour
     void Update()
     {
         
+    }
+    
+
+    public void Move(Directions direction)
+    {
+        //throw new System.NotImplementedException();
+    }
+
+    public override void OnDeath()
+    {
+        //throw new System.NotImplementedException();
     }
 }
