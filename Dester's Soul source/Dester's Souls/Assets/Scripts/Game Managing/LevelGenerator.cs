@@ -38,14 +38,11 @@ public class LevelGenerator : MonoBehaviour
         dungeon = new int[sizeY][];
         for (int i = 0; i < sizeY; i++)
         {
-            string s="";
             dungeon[i] = new int[sizeX];
             for (int j = 0; j < sizeX; j++)
             {
                 dungeon[i][j] = 1;
-                s += dungeon[i][j].ToString() + " ";
             }
-            Debug.Log(s);
         }
         CreateIfPossible(rnd.Next(4, 8), rnd.Next(4, 8), 0, rnd.Next(10, 16), rnd.Next(10, 16), false);
         rooms[0].isConnected = true;
@@ -133,8 +130,16 @@ public class LevelGenerator : MonoBehaviour
         Point randInLast = lastRoom.RandomPointFromRoom();
         dungeon[randInLast.Y][randInLast.X] = 4;
         PutHero();
-
-
+        
+        foreach(int[] itgr in dungeon)
+        {
+            string s = "";
+            foreach(int integer in itgr)
+            {
+                s += integer.ToString();
+            }
+            Debug.Log(s);
+        }
         return dungeon;
 
     }

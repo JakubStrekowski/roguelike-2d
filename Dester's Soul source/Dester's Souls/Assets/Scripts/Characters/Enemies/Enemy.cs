@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-public abstract class Enemy : Character
+public abstract class Enemy : Character, IPlayerStandardInteraction
 {
     public int id;
     public int speed;
@@ -105,5 +105,10 @@ public abstract class Enemy : Character
                 break;
         }
         return false;
+    }
+
+    public void OnPlayerInteract(PlayerCharacter source)
+    {
+        OnTakenDamage(source.AttackValue);
     }
 }

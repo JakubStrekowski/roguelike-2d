@@ -6,6 +6,7 @@ public class Map : MonoBehaviour
 {
     public Tile[][] tileMap;
     public Character[][] charactersMap;
+    public Item[][] itemsMap;
     int mapRowLimit;
     int mapColumnLimit;
 
@@ -17,14 +18,17 @@ public class Map : MonoBehaviour
         mapColumnLimit = ColumnAmmount;
         this.tileMap = new Tile[mapRowLimit][];
         this.charactersMap = new Character[mapRowLimit][];
+        this.itemsMap = new Item[mapRowLimit][];
         int rowCounter = 0;
         foreach (int[] intRow in intMap)
         {
             this.tileMap[rowCounter] = new Tile[mapColumnLimit];
+            this.charactersMap[rowCounter] = new Character[mapColumnLimit];
+            this.itemsMap[rowCounter] = new Item[mapColumnLimit];
             int columnCounter = 0;
             foreach (int integer in intRow)
             {
-                if(integer<2)
+                if(integer == 0 || integer == 1 || integer == 4)
                 {
                     this.tileMap[rowCounter][columnCounter] =
                         GameManager._instance.tileFactory.Get(integer, columnCounter, rowCounter, this).GetComponent<Tile>();
@@ -33,8 +37,17 @@ public class Map : MonoBehaviour
                 {
                     this.tileMap[rowCounter][columnCounter] =
                         GameManager._instance.tileFactory.Get(0, columnCounter, rowCounter, this).GetComponent<Tile>();
-                    this.charactersMap[rowCounter][columnCounter] =
-                        GameManager._instance.tileFactory.Get(integer, columnCounter, rowCounter, this).GetComponent<Character>();
+                    if(integer==2|| integer == 3 || integer == 6 || integer == 8 || integer == 9)//if it's a character
+                    {
+                        this.charactersMap[rowCounter][columnCounter] =
+                            GameManager._instance.tileFactory.Get(integer, columnCounter, rowCounter, this).GetComponent<Character>(); //creating character
+                    }
+                    else if(integer == 5 || integer == 7)
+                    {
+                        this.itemsMap[rowCounter][columnCounter] =
+                            GameManager._instance.tileFactory.Get(integer, columnCounter, rowCounter, this).GetComponent<Item>();
+                    }
+
                 }
                 columnCounter++;
             }

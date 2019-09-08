@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -22,15 +23,9 @@ public class GameManager : MonoBehaviour
         CurrentLevel = 1;
     }
 
-    // Start is called before the first frame update
-    void Start()
+    public void GoDownStairs()
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        CurrentLevel++;
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 }
