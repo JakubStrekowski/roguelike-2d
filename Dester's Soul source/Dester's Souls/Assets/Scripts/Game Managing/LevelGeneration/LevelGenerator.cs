@@ -1,10 +1,37 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static AStarCorridors;
+
+public class DungeonStruct
+{
+    public int[][] dungeon;
+    public int[][] characterMap;
+    public int[][] itemMap;
+
+    public DungeonStruct(int sizeX, int sizeY)
+    {
+        dungeon = new int[sizeY][];
+        characterMap = new int[sizeY][];
+        itemMap = new int[sizeY][];
+        for (int i = 0; i < sizeY; i++)
+        {
+            dungeon[i] = new int[sizeX];
+            characterMap[i] = new int[sizeX];
+            itemMap[i] = new int[sizeX];
+            for (int j = 0; j < sizeX; j++)
+            {
+                dungeon[i][j] = 10;
+                characterMap[i][j] = 0;
+                itemMap[i][j] = 0;
+            }
+        }
+    }
+}
 
 public class LevelGenerator : MonoBehaviour
 {
-    private int[][] dungeon;
+    private DungeonStruct dungeonStructure;
     private List<Room> rooms;
     private List<Room> connectedRooms;
     private int mapSizeX;
@@ -18,32 +45,17 @@ public class LevelGenerator : MonoBehaviour
         connectedRooms = new List<Room>();
         rooms = new List<Room>();
         rnd = new System.Random();
-        dungeon = new int[sizeY][];
-        for (int i = 0; i < sizeY; i++)
-        {
-            dungeon[i] = new int[sizeX];
-            for (int j = 0; j < sizeX; j++)
-            {
-                dungeon[i][j] = 1;
-            }
-        }
+        dungeonStructure = new DungeonStruct(sizeX, sizeY);
     }
 
-    public int[][] CreateDungeon(int sizeX, int sizeY, int roomsAmnt)
+    public DungeonStruct CreateDungeon(int sizeX, int sizeY, int roomsAmnt)
     {
         mapSizeX = sizeX;
         mapSizeY = sizeY;
         rooms = new List<Room>();
         rnd = new System.Random();
-        dungeon = new int[sizeY][];
-        for (int i = 0; i < sizeY; i++)
-        {
-            dungeon[i] = new int[sizeX];
-            for (int j = 0; j < sizeX; j++)
-            {
-                dungeon[i][j] = 1;
-            }
-        }
+        dungeonStructure = new DungeonStruct(sizeX, sizeY);
+
         CreateIfPossible(rnd.Next(4, 8), rnd.Next(4, 8), 0, rnd.Next(10, 16), rnd.Next(10, 16), false);
         rooms[0].isConnected = true;
         connectedRooms.Add(rooms[0]);
@@ -62,6 +74,8 @@ public class LevelGenerator : MonoBehaviour
 
         }
         int id = 0;
+        //every room connects to another room, which wasnt connected to any before
+        /*
         foreach (Room room in rooms)
         {
             if (!room.isConnected)
@@ -83,7 +97,7 @@ public class LevelGenerator : MonoBehaviour
             id++;
         }
 
-
+        //adding random room connections
         int randomConnections = rnd.Next(2, 8);
         for (int i = 0; i < randomConnections; i++)
         {
@@ -95,9 +109,69 @@ public class LevelGenerator : MonoBehaviour
             }
             ConnectTwoRooms(connectedRooms[room1], connectedRooms[room2]);
         }
+        */
+        
+        AStarCorridors aStarCorridors = new AStarCorridors(sizeX, sizeY);
+        foreach (Room room in rooms)
+        {
+            if (!room.isConnected)
+            {
+                int rand = rnd.Next(connectedRooms.Count);
+                Room rndroom = rooms[rand];
+                while (rndroom == room)
+                {
+                    rand = rnd.Next(rooms.Count);
+                    rndroom = rooms[rand];
+                }
+                connectedRooms.Add(room);
+                List<Node>path= aStarCorridors.ConnectTwoRoomsNoCollisions(dungeonStructure.dungeon, rooms, room, rndroom);
+                if(!(path is null))
+                {
+                    foreach (Node node in path)
+                    {
+                        if (dungeonStructure.dungeon[node.position.Y][node.position.X] > 9) dungeonStructure.dungeon[node.position.Y][node.position.X] = 0;
+                    }
+                    room.AddConnection(rand);
+                    rndroom.AddConnection(id);
+                    room.isConnected = true;
+                    rndroom.isConnected = true;
+                }
+                else
+                {
+                    Debug.Log("Path was null");
+                }
+            }
+            id++;
+        }
 
+        int randomConnections = rnd.Next(2, 8);
+        for (int i = 0; i < randomConnections; i++)
+        {
+            int room1 = rnd.Next(connectedRooms.Count);
+            int room2 = rnd.Next(connectedRooms.Count);
+            if (room1 == room2)
+            {
+                room2 = rnd.Next(connectedRooms.Count);
+            }
+            List<Node>path= aStarCorridors.ConnectTwoRoomsNoCollisions(dungeonStructure.dungeon, rooms, connectedRooms[room1], connectedRooms[room2]);
+                if(!(path is null))
+                {
+                    foreach (Node node in path)
+                    {
+                        if (dungeonStructure.dungeon[node.position.Y][node.position.X] > 9) dungeonStructure.dungeon[node.position.Y][node.position.X] = 0;
+                    }
+                    connectedRooms[room1].AddConnection(room2);
+                    connectedRooms[room2].AddConnection(room1);
+                    connectedRooms[room1].isConnected = true;
+                    connectedRooms[room2].isConnected = true;
+                }
+                else
+                {
+                    Debug.Log("Path was null");
+                }
+        }
 
-
+        //placing enemies and items
         for (int i = 1; i < rooms.Count; i++)
         {
             int enemyAmnt = rnd.Next(2, 6);
@@ -106,41 +180,35 @@ public class LevelGenerator : MonoBehaviour
             for (int j = 0; j < enemyAmnt; j++)
             {
                 Point pnt = rooms[i].RandomPointFromRoom();
-                switch (rnd.Next(5))
-                {
-                    case 0: dungeon[pnt.Y][pnt.X] = 3; break;
-                    case 1: dungeon[pnt.Y][pnt.X] = 6; break;
-                    case 2: dungeon[pnt.Y][pnt.X] = 8; break;
-                    case 3: dungeon[pnt.Y][pnt.X] = 9; break;
-                }
+                dungeonStructure.characterMap[pnt.Y][pnt.X] = Random.Range(2, 6);
             }
             if (goldChance == 2)
             {
                 Point pnt = rooms[i].RandomPointFromRoom();
-                dungeon[pnt.Y][pnt.X] = 5;
+                dungeonStructure.itemMap[pnt.Y][pnt.X] = 1;
             }
             if (healthPotsChance == 9)
             {
                 Point pnt = rooms[i].RandomPointFromRoom();
-                dungeon[pnt.Y][pnt.X] = 7;
+                dungeonStructure.itemMap[pnt.Y][pnt.X] = 2;
             }
         }
 
         Room lastRoom = FindFurthest(rooms[0]);
         Point randInLast = lastRoom.RandomPointFromRoom();
-        dungeon[randInLast.Y][randInLast.X] = 4;
+        dungeonStructure.dungeon[randInLast.Y][randInLast.X] = 20;
         PutHero();
-        
-        foreach(int[] itgr in dungeon)
+
+        foreach (int[] itgr in dungeonStructure.characterMap)
         {
             string s = "";
-            foreach(int integer in itgr)
+            foreach (int integer in itgr)
             {
-                s += integer.ToString();
+                s += integer.ToString()+" ";
             }
-            Debug.Log(s);
+            //Debug.Log(s);
         }
-        return dungeon;
+        return dungeonStructure;
 
     }
 
@@ -194,28 +262,30 @@ public class LevelGenerator : MonoBehaviour
         {
             for (int j = beginX; j < sizeX + beginX; j++)
             {
-                if (dungeon[i][j] != 1)
+                if (dungeonStructure.dungeon[i][j] != 10)
                 {
                     return false;
                 }
             }
         }
         if (!possible) return false;
+        Room room = new Room(beginX, sizeX, beginY, sizeY);
+        if (!corridor) rooms.Add(room);
         for (int i = beginY; i < sizeY + beginY; i++)
         {
             for (int j = beginX; j < sizeX + beginX; j++)
             {
-                if (!corridor && (i == 0 || j == 0 || i == beginY + sizeY - 1 || j == beginX + sizeX - 1))
+                if (!corridor && (i == beginY || j == beginX || i == beginY + sizeY - 1 || j == beginX + sizeX - 1))
                 {
-                    dungeon[i][j] = 1;
+                    dungeonStructure.dungeon[i][j] = room.wallVariant;
                 }
                 else
                 {
-                    dungeon[i][j] = 0;
+                    dungeonStructure.dungeon[i][j] = room.floorVariant;
                 }
             }
         }
-        if (!corridor) rooms.Add(new Room(beginX, sizeX, beginY, sizeY));
+        
         return true;
     }
 
@@ -266,7 +336,7 @@ public class LevelGenerator : MonoBehaviour
                 if (MeasureDistance(pointRoom1, possibleRoute).Y < distanceY && !madeStep)
                 {
                     distanceY = MeasureDistance(pointRoom1, possibleRoute).Y;
-                    dungeon[possibleRoute.Y][possibleRoute.X] = 0;
+                    if(dungeonStructure.dungeon[possibleRoute.Y][possibleRoute.X]>9)dungeonStructure.dungeon[possibleRoute.Y][possibleRoute.X] = 0;
                     currentPoint = possibleRoute;
                     madeStep = true;
                 }
@@ -276,7 +346,7 @@ public class LevelGenerator : MonoBehaviour
                     if (MeasureDistance(pointRoom1, possibleRoute).Y < distanceY && !madeStep)
                     {
                         distanceY = MeasureDistance(pointRoom1, possibleRoute).Y;
-                        dungeon[possibleRoute.Y][possibleRoute.X] = 0;
+                        if (dungeonStructure.dungeon[possibleRoute.Y][possibleRoute.X] > 9) dungeonStructure.dungeon[possibleRoute.Y][possibleRoute.X] = 0;
                         currentPoint = possibleRoute;
                         madeStep = true;
                     }
@@ -286,7 +356,7 @@ public class LevelGenerator : MonoBehaviour
                 if (MeasureDistance(pointRoom1, possibleRoute).X < distanceX && !madeStep)
                 {
                     distanceX = MeasureDistance(pointRoom1, possibleRoute).X;
-                    dungeon[possibleRoute.Y][possibleRoute.X] = 0;
+                    if (dungeonStructure.dungeon[possibleRoute.Y][possibleRoute.X] > 9) dungeonStructure.dungeon[possibleRoute.Y][possibleRoute.X] = 0;
                     currentPoint = possibleRoute;
                     madeStep = true;
                 }
@@ -296,7 +366,7 @@ public class LevelGenerator : MonoBehaviour
                     if (MeasureDistance(pointRoom1, possibleRoute).X < distanceX && !madeStep)
                     {
                         distanceX = MeasureDistance(pointRoom1, possibleRoute).X;
-                        dungeon[possibleRoute.Y][possibleRoute.X] = 0;
+                        if (dungeonStructure.dungeon[possibleRoute.Y][possibleRoute.X] > 9) dungeonStructure.dungeon[possibleRoute.Y][possibleRoute.X] = 0;
                         currentPoint = possibleRoute;
                         madeStep = true;
                     }
@@ -309,7 +379,7 @@ public class LevelGenerator : MonoBehaviour
                 if (MeasureDistance(pointRoom1, possibleRoute).X < distanceX && !madeStep)
                 {
                     distanceX = MeasureDistance(pointRoom1, possibleRoute).X;
-                    dungeon[possibleRoute.Y][possibleRoute.X] = 0;
+                    if (dungeonStructure.dungeon[possibleRoute.Y][possibleRoute.X] > 9) dungeonStructure.dungeon[possibleRoute.Y][possibleRoute.X] = 0;
                     currentPoint = possibleRoute;
                     madeStep = true;
                 }
@@ -319,7 +389,7 @@ public class LevelGenerator : MonoBehaviour
                     if (MeasureDistance(pointRoom1, possibleRoute).X < distanceX && !madeStep)
                     {
                         distanceX = MeasureDistance(pointRoom1, possibleRoute).X;
-                        dungeon[possibleRoute.Y][possibleRoute.X] = 0;
+                        if (dungeonStructure.dungeon[possibleRoute.Y][possibleRoute.X] > 9) dungeonStructure.dungeon[possibleRoute.Y][possibleRoute.X] = 0;
                         currentPoint = possibleRoute;
                         madeStep = true;
                     }
@@ -329,7 +399,7 @@ public class LevelGenerator : MonoBehaviour
                 if (MeasureDistance(pointRoom1, possibleRoute).Y < distanceY && !madeStep)
                 {
                     distanceY = MeasureDistance(pointRoom1, possibleRoute).Y;
-                    dungeon[possibleRoute.Y][possibleRoute.X] = 0;
+                    if (dungeonStructure.dungeon[possibleRoute.Y][possibleRoute.X] > 9) dungeonStructure.dungeon[possibleRoute.Y][possibleRoute.X] = 0;
                     currentPoint = possibleRoute;
                     madeStep = true;
                 }
@@ -339,7 +409,7 @@ public class LevelGenerator : MonoBehaviour
                     if (MeasureDistance(pointRoom1, possibleRoute).Y < distanceY && !madeStep)
                     {
                         distanceY = MeasureDistance(pointRoom1, possibleRoute).Y;
-                        dungeon[possibleRoute.Y][possibleRoute.X] = 0;
+                        if (dungeonStructure.dungeon[possibleRoute.Y][possibleRoute.X] > 9) dungeonStructure.dungeon[possibleRoute.Y][possibleRoute.X] = 0;
                         currentPoint = possibleRoute;
                         madeStep = true;
                     }
@@ -355,7 +425,7 @@ public class LevelGenerator : MonoBehaviour
     }
 
 
-    private Point MeasureDistance(Point a, Point b)
+    public static Point MeasureDistance(Point a, Point b)
     {
         Point distance;
         if (a.X < b.X)
@@ -381,7 +451,7 @@ public class LevelGenerator : MonoBehaviour
     {
         int posX = rnd.Next(rooms[0].beginX + 1, rooms[0].beginX + rooms[0].sizeX - 1);
         int posY = rnd.Next(rooms[0].beginY + 1, rooms[0].beginY + rooms[0].sizeY - 1);
-        dungeon[posY][posX] = 2;
+        dungeonStructure.characterMap[posY][posX] = 1;
     }
 
     public class Room
@@ -392,6 +462,8 @@ public class LevelGenerator : MonoBehaviour
         public int sizeY;
         public bool isConnected;
         public bool visited;
+        public int floorVariant;
+        public int wallVariant;
         private System.Random rnd;
         public List<int> connectedRooms;
 
@@ -405,6 +477,8 @@ public class LevelGenerator : MonoBehaviour
             beginY = by;
             sizeY = sy;
             isConnected = false;
+            floorVariant = Random.Range(0, 6);
+            wallVariant = Random.Range(10, 12);
         }
         public Point PointFromWall(int direction)
         {
@@ -444,6 +518,11 @@ public class LevelGenerator : MonoBehaviour
             pnt.X = rnd.Next(beginX + 1, beginX + sizeX - 1);
             pnt.Y = rnd.Next(beginY + 1, beginY + sizeY - 1);
             return pnt;
+        }
+
+        public void ChangeFloorStyle()
+        {
+
         }
     }
 

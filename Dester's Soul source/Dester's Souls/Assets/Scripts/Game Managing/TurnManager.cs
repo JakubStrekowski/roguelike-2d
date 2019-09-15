@@ -12,6 +12,7 @@ public class TurnManager : MonoBehaviour
     public GameInput gameInput;
     public PlayerCharacter hero;
     public List<Enemy> enemyList;
+    public Camera mainCamera;
 
     private Map currentMap;
     private bool isHeroAlife;
@@ -23,6 +24,8 @@ public class TurnManager : MonoBehaviour
         isHeroAlife = true;
         hasTurnEnded = true;
         GenerateRandom(GameManager._instance.CurrentLevel);
+        mainCamera.transform.position = new Vector3(hero.transform.position.x, hero.transform.position.y, -10);
+        mainCamera.GetComponent<SmoothCamera>().target = hero.gameObject.transform;
         PlayInMap();
     }
 
@@ -30,8 +33,11 @@ public class TurnManager : MonoBehaviour
     {
         if (isHeroAlife)
         {
-            ResolvePlayerMovement();
-            ResolveTurn();
+            if (ResolvePlayerMovement())
+            {
+                ResolveTurn();
+                currentMap.FOV(hero);
+            }
         }
     }
 
@@ -39,7 +45,7 @@ public class TurnManager : MonoBehaviour
     {
         foreach(Enemy enemy in enemyList)
         {
-            enemy.MovementBehaviour();
+             enemy.MovementBehaviour();
         }
     }
 
@@ -49,6 +55,7 @@ public class TurnManager : MonoBehaviour
         {
             switch (gameInput.TakeInput())
             {
+                case null:return false;
                 case "ArrowUp":
                     {
                         hero.Move(Character.Directions.up);
@@ -140,9 +147,9 @@ public class TurnManager : MonoBehaviour
     public Map GenerateRandom(int floorNumber)
     {
         System.Random rnd = new System.Random();
-        int[][] dungeon = new int[100][];
-        dungeon = SetDungeonSize(floorNumber);
-        Map newMap = new Map(dungeon, dungeon.Length, dungeon[0].Length);
+        DungeonStruct dungeonStructure = new DungeonStruct(300,150);
+        dungeonStructure = SetDungeonSize(floorNumber);
+        Map newMap = new Map(dungeonStructure, dungeonStructure.dungeon.Length, dungeonStructure.dungeon[0].Length,this);
         currentMap = newMap;
         /*
         display.SetStatUI(1, hero.name);
@@ -168,7 +175,7 @@ public class TurnManager : MonoBehaviour
         return newMap;
     }
 
-    private int[][] SetDungeonSize(int floorNumber)
+    private DungeonStruct SetDungeonSize(int floorNumber)
     {
         LevelGenerator mapGenerator = new LevelGenerator(100, 50);
         int rowAmmount = 0;
@@ -188,10 +195,15 @@ public class TurnManager : MonoBehaviour
                 columnAmmount = 85;
                 return mapGenerator.CreateDungeon(columnAmmount, rowAmmount, 16);
             case 4:
-                rowAmmount = 50;
-                columnAmmount = 100;
-                return mapGenerator.CreateDungeon(columnAmmount, rowAmmount, 20);
+                rowAmmount = 150;
+                columnAmmount = 300;
+                return mapGenerator.CreateDungeon(columnAmmount, rowAmmount, 130);
         }
         return mapGenerator.CreateDungeon(columnAmmount, rowAmmount, 20); ;
+    }
+
+    public void RemoveEnemyFromList(Enemy enemy)
+    {
+        enemyList.Remove(enemy);
     }
 }

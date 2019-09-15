@@ -9,9 +9,9 @@ public abstract class Character : MonoBehaviour, IPositionInitializer
         up, down, right, left
     }
 
-    private int _healthPoints;
+    int _healthPoints;
     private int _attackValue;
-
+    
     public int HealthPoints { get => _healthPoints;
         set => _healthPoints = value; }
     public int AttackValue { get => _attackValue; protected set => _attackValue = value; }
@@ -20,6 +20,7 @@ public abstract class Character : MonoBehaviour, IPositionInitializer
     protected int posY;
 
     protected Map currentMap;
+    protected TurnManager turnManager;
 
     private Item[] equipment;
     // Start is called before the first frame update
@@ -32,19 +33,24 @@ public abstract class Character : MonoBehaviour, IPositionInitializer
 
     public virtual void OnDeath()
     {
-        //TODO
+        GameObject.Destroy(gameObject);
     }
 
     public void OnTakenDamage(int damageAmmount)
     {
-
+        HealthPoints -= damageAmmount;
+        if (HealthPoints <= 0)
+        {
+            OnDeath();
+        }
     }
 
-    public void InitializePosition(int posX, int posY,Map currentMap)
+    public virtual void InitializePosition(int posX, int posY,Map currentMap,TurnManager turnManager)
     {
         this.posX = posX;
         this.posY = posY;
         this.currentMap = currentMap;
+        this.turnManager = turnManager;
     }
 
     public bool isEnoughRoomInEq()
@@ -67,5 +73,10 @@ public abstract class Character : MonoBehaviour, IPositionInitializer
                 return;
             }
         }
+    }
+
+    protected void OnCharacterMoved()
+    {
+        gameObject.transform.position = new Vector3(posX, posY, gameObject.transform.position.z);
     }
 }

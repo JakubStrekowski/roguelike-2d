@@ -3,18 +3,20 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-public abstract class Enemy : Character, IPlayerStandardInteraction
+public abstract class Enemy : Character, IPlayerStandardInteraction, IVisibility
 {
-    public int id;
     public int speed;
     public int giveGold;
-
-    void Start()
-    {
-        
-    }
+    
 
     public abstract void MovementBehaviour();
+
+    protected SpriteRenderer spriteRenderer;
+    void Awake()
+    {
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        TurnInvisible();
+    }
 
     public bool MoveDirection(Directions direction)
     {
@@ -24,12 +26,13 @@ public abstract class Enemy : Character, IPlayerStandardInteraction
         switch (direction)
         {
             case Directions.up:
-                targetPositionY = targetPositionY - 1;
+                targetPositionY = targetPositionY + 1;
                 tileInfo = currentMap.IsTilePassable(posX, posY, 0);
                 if (tileInfo == 0)
                 {
                     currentMap.SwitchElements(posX, posY, targetPositionX, targetPositionY);
-                    posY = posY - 1;
+                    posY = posY + 1;
+                    OnCharacterMoved();
                     return true;
                 }
                 else
@@ -43,13 +46,14 @@ public abstract class Enemy : Character, IPlayerStandardInteraction
                 }
                 break;
             case Directions.down:
-                targetPositionY = targetPositionY + 1;
+                targetPositionY = targetPositionY - 1;
                 tileInfo = currentMap.IsTilePassable(posX, posY, Directions.down);
 
                 if (tileInfo==0)
                 {
                     currentMap.SwitchElements(posX, posY, targetPositionX, targetPositionY);
-                    posY = posY + 1;
+                    posY = posY - 1;
+                    OnCharacterMoved();
                     return true;
                 }
                 else
@@ -69,7 +73,8 @@ public abstract class Enemy : Character, IPlayerStandardInteraction
                 if (tileInfo==0)
                 {
                     currentMap.SwitchElements(posX, posY, targetPositionX, targetPositionY);
-                    posX = posY + 1;
+                    posX = posX + 1;
+                    OnCharacterMoved();
                     return true;
                 }
                 else
@@ -91,6 +96,7 @@ public abstract class Enemy : Character, IPlayerStandardInteraction
                 {
                     currentMap.SwitchElements(posX, posY, targetPositionX, targetPositionY);
                     posX = posX - 1;
+                    OnCharacterMoved();
                     return true;
                 }
                 else
@@ -110,5 +116,29 @@ public abstract class Enemy : Character, IPlayerStandardInteraction
     public void OnPlayerInteract(PlayerCharacter source)
     {
         OnTakenDamage(source.AttackValue);
+    }
+
+    public void InitializePosition(int posX, int posY, Map currentMap, TurnManager turnManager)
+    {
+        this.posX = posX;
+        this.posY = posY;
+        this.currentMap = currentMap;
+        this.turnManager = turnManager;
+    }
+
+    public override void OnDeath()
+    {
+        turnManager.RemoveEnemyFromList(this);
+        Destroy(gameObject);
+    }
+
+    public void TurnVisible()
+    {
+        spriteRenderer.enabled = true;
+    }
+
+    public void TurnInvisible()
+    {
+        //spriteRenderer.enabled = false;
     }
 }

@@ -20,7 +20,7 @@ public class GameManager : MonoBehaviour
             return;
         }
         _instance = this;
-        CurrentLevel = 1;
+        CurrentLevel = 4;
     }
 
     public void GoDownStairs()

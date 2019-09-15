@@ -4,5 +4,5 @@ using UnityEngine;
 
 public interface IPositionInitializer
 {
-    void InitializePosition(int x, int y, Map currentMap);
+    void InitializePosition(int x, int y, Map currentMap, TurnManager tm);
 }
