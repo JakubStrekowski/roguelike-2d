@@ -31,7 +31,7 @@ public class Tile : MonoBehaviour, IPositionInitializer, IVisibility
     }
 
     public void TurnInvisible()
-    {/*
+    {
         if (wasVisited)
         {
             sr.color = new Color(0.5f, 0.5f, 0.5f);
@@ -39,6 +39,11 @@ public class Tile : MonoBehaviour, IPositionInitializer, IVisibility
         else
         {
             sr.enabled = false;
-        }*/
+        }
+    }
+
+    public virtual void OnPlayerInteract(PlayerCharacter source)
+    {
+
     }
 }

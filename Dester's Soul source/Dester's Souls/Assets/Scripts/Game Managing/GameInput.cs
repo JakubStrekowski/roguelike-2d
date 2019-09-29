@@ -88,6 +88,11 @@ public class GameInput:MonoBehaviour
             KeyUsed();
             return "6";
         }
+        if (Input.GetKey(KeyCode.R))
+        {
+            KeyUsed();
+            return "R";
+        }
         return null;
     }
 

@@ -81,7 +81,7 @@ public class AStarCorridors
     List<Node> closedNodes;
     int[][] costTable;
 
-    public AStarCorridors(int sizeX, int sizeY)
+    public AStarCorridors(int sizeX, int sizeY, int[][] dungeon, List<Room> allRooms)
     {
         openNodes = new List<Node>();
         closedNodes = new List<Node>();
@@ -94,25 +94,19 @@ public class AStarCorridors
                 costTable[i][j] = 1;
             }
         }
+        InitCostValuesNoCollisions(allRooms, dungeon);
     }
 
     private void ResetCostValues()
     {
-        openNodes = new List<Node>();
-        closedNodes = new List<Node>();
-        for (int i = 0; i < costTable.Length; i++)
-        {
-            for (int j = 0; j < costTable[0].Length; j++)
-            {
-                costTable[i][j] = 2;
-            }
-        }
+        openNodes.Clear();
+        closedNodes.Clear();
     }
 
     public List<Node> ConnectTwoRoomsNoCollisions(int[][] dungeon,List<Room>allRooms, Room sourceRoom, Room targetRoom)
     {
         ResetCostValues();
-        SetCostValuesNoCollisions(allRooms, sourceRoom, targetRoom,dungeon);
+        SetSourceTargetRoomCosts(sourceRoom, targetRoom);
         Point sourcePoint = sourceRoom.RandomPointFromRoom();
         Point targetPoint = targetRoom.RandomPointFromRoom();
         
@@ -135,6 +129,7 @@ public class AStarCorridors
             closedNodes.Add(currentNode);
             if (currentNode.position.Y == targetPoint.Y && currentNode.position.X == targetPoint.X)
             {
+                ResetSourceTargetRoomCosts(sourceRoom, targetRoom);
                 return RecreatePath(currentNode);
             }
             //generating succesor nodes
@@ -143,7 +138,7 @@ public class AStarCorridors
             foreach (Node successorNode in successors)
             {
                 if (successorNode.position.X == 0 || successorNode.position.Y == 0 
-                    || successorNode.position.X == dungeon[0].Length || successorNode.position.Y == dungeon.Length) continue;
+                    || successorNode.position.X == dungeon[0].Length-1 || successorNode.position.Y == dungeon.Length-1) continue;
 
                 if (closedNodes.Exists(x => (x.position.X == successorNode.position.X) && (x.position.Y == successorNode.position.Y))) continue;
 
@@ -198,12 +193,13 @@ public class AStarCorridors
         while (currentNode != null)
         {
             path.Add(currentNode);
+            costTable[currentNode.position.Y][currentNode.position.X] = 1;
             currentNode = currentNode.previousNode;
         }
         return path;
     }
 
-    private void SetCostValuesNoCollisions(List<Room> allRooms, Room sourceRoom, Room targetRoom, int[][] dungeon)
+    private void InitCostValuesNoCollisions(List<Room> allRooms, int[][] dungeon)
     {
         int i = 0;
         int j = 0;
@@ -241,12 +237,16 @@ public class AStarCorridors
                 }
             }
         }
+    }
+
+    private void SetSourceTargetRoomCosts(Room sourceRoom, Room targetRoom)
+    {
         //assigning cost values for walls and floors, allowing to pass source floor
-        for (i = sourceRoom.beginY; i < sourceRoom.beginY + sourceRoom.sizeY; i++)
+        for (int i = sourceRoom.beginY; i < sourceRoom.beginY + sourceRoom.sizeY; i++)
         {
-            for (j = sourceRoom.beginX; j < sourceRoom.beginX + sourceRoom.sizeX; j++)
+            for (int j = sourceRoom.beginX; j < sourceRoom.beginX + sourceRoom.sizeX; j++)
             {
-                if(j == sourceRoom.beginX||j== sourceRoom.beginX + sourceRoom.sizeX-1||i== sourceRoom.beginY|| i==sourceRoom.beginY + sourceRoom.sizeY-1)
+                if (j == sourceRoom.beginX || j == sourceRoom.beginX + sourceRoom.sizeX - 1 || i == sourceRoom.beginY || i == sourceRoom.beginY + sourceRoom.sizeY - 1)
                 {
                     costTable[i][j] = 10;
                 }
@@ -257,13 +257,47 @@ public class AStarCorridors
             }
         }
         //assigning cost values for walls and floors, allowing to pass target floor
-        for (i = targetRoom.beginY; i < targetRoom.beginY + targetRoom.sizeY; i++)
+        for (int i = targetRoom.beginY; i < targetRoom.beginY + targetRoom.sizeY; i++)
         {
-            for (j = targetRoom.beginX; j < targetRoom.beginX + targetRoom.sizeX; j++)
+            for (int j = targetRoom.beginX; j < targetRoom.beginX + targetRoom.sizeX; j++)
             {
-                if (j == targetRoom.beginX || j == targetRoom.beginX + targetRoom.sizeX -1|| i == targetRoom.beginY || i == targetRoom.beginY + targetRoom.sizeY-1)
+                if (j == targetRoom.beginX || j == targetRoom.beginX + targetRoom.sizeX - 1 || i == targetRoom.beginY || i == targetRoom.beginY + targetRoom.sizeY - 1)
                 {
                     costTable[i][j] = 10;
+                }
+                else
+                {
+                    costTable[i][j] = 1;
+                }
+            }
+        }
+    }
+
+    private void ResetSourceTargetRoomCosts(Room source, Room target)
+    {
+        //resetting costs for source room
+        for (int i = source.beginY; i < source.beginY + source.sizeY; i++)
+        {
+            for (int j = source.beginX; j < source.beginX + source.sizeX; j++)
+            {
+                if (j == source.beginX || j == source.beginX + source.sizeX - 1 || i == source.beginY || i == source.beginY + source.sizeY - 1)
+                {
+                    costTable[i][j] = 999;
+                }
+                else
+                {
+                    costTable[i][j] = 1;
+                }
+            }
+        }
+        //resetting costs for target room
+        for (int i = target.beginY; i < target.beginY + target.sizeY; i++)
+        {
+            for (int j = target.beginX; j < target.beginX + target.sizeX; j++)
+            {
+                if (j == target.beginX || j == target.beginX + target.sizeX - 1 || i == target.beginY || i == target.beginY + target.sizeY - 1)
+                {
+                    costTable[i][j] = 999;
                 }
                 else
                 {

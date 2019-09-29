@@ -28,6 +28,7 @@ public abstract class Item : MonoBehaviour, IPlayerStandardInteraction, IPositio
         {
             source.AddItemToEquipment(this);
             OnItemPickedUpEvent(source);
+            Destroy(gameObject);
         }
     }
 

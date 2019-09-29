@@ -4,15 +4,31 @@ using UnityEngine;
 
 public class PlayerDataManager : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    private void Awake()
     {
-        
+        DontDestroyOnLoad(this);
+    }
+    private void Start()
+    {
+        ResetValues();
     }
 
-    // Update is called once per frame
-    void Update()
+    public int playerHealth=4;
+    public int gold=0;
+    public int enemyKilled=0;
+    public int attackValue=1;
+    public int vision = 5;
+
+    public Item[] equipment;
+
+    public void ResetValues()
     {
-        
+        playerHealth = 4;
+        gold = 0;
+        enemyKilled = 0;
+        attackValue=1;
+        vision = 5;
+
+    equipment = new Item[5];
     }
 }

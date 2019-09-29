@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Map : MonoBehaviour
+public class Map
 {
     public Tile[][] tileMap;
     public Character[][] charactersMap;
@@ -48,6 +48,8 @@ public class Map : MonoBehaviour
                     if (integer == 1)
                     {
                         turnManager.hero = charactersMap[rowCounter][columnCounter] as PlayerCharacter;
+                        turnManager.hero.OnHealthChange += turnManager.UpdateHeroHealthGUI;
+                        turnManager.hero.OnIsDeathChange += turnManager.UpdateHeroDeathGUI;
                     }
                     else
                     {
@@ -253,6 +255,7 @@ public class Map : MonoBehaviour
         {
             for(int j = beginX; j < endX; j++)
             {
+                
                 visibility = (IVisibility)tileMap[i][j].GetComponent(typeof(IVisibility));//Set the tile to visible.
                 visibility.TurnInvisible();
                 if (charactersMap[i][j]!=null)
@@ -268,6 +271,7 @@ public class Map : MonoBehaviour
                     visibility = (IVisibility)itemsMap[i][j].GetComponent(typeof(IVisibility));//Set the tile to visible.
                     visibility.TurnInvisible();
                 }
+                
             }
         }
     }

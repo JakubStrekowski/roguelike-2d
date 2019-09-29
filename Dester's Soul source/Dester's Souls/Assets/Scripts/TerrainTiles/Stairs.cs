@@ -5,8 +5,9 @@ using UnityEngine;
 
 public class Stairs : Tile, IPlayerStandardInteraction
 {
-    public void OnPlayerInteract(PlayerCharacter source)
+    public override void OnPlayerInteract(PlayerCharacter source)
     {
+        source.SetDataValues();
         GameManager._instance.GoDownStairs();
     }
 }

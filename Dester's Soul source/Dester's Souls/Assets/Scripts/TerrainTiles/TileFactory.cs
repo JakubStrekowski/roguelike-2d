@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class TileFactory : MonoBehaviour
 {
@@ -12,7 +10,7 @@ public class TileFactory : MonoBehaviour
 
     private void OnLevelWasLoaded(int level)
     {
-        if (level == 1)
+        if (level == 0)
         {
             turnManager = GameObject.Find("DungeonManager").GetComponent<TurnManager>();
             Debug.Log(turnManager.ToString());

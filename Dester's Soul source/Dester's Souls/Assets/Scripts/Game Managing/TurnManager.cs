@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class TurnManager : MonoBehaviour
 {
@@ -14,6 +16,14 @@ public class TurnManager : MonoBehaviour
     public List<Enemy> enemyList;
     public Camera mainCamera;
 
+
+    //UI
+    public Image[] heartContainers;
+    public GameObject deathPanel;
+    public GameObject loadingScreen;
+    public TextMeshProUGUI goldAmnt;
+    public TextMeshProUGUI enemyKilledAmnt;
+
     private Map currentMap;
     private bool isHeroAlife;
     private bool hasTurnEnded;
@@ -21,12 +31,13 @@ public class TurnManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        enemyList.Clear();
+        GameManager._instance.OnGoldChange+= UpdateHeroGoldGUI;
+        GameManager._instance.OnKillsChange += UpdateHeroKillsGUI;
         isHeroAlife = true;
         hasTurnEnded = true;
-        GenerateRandom(GameManager._instance.CurrentLevel);
-        mainCamera.transform.position = new Vector3(hero.transform.position.x, hero.transform.position.y, -10);
-        mainCamera.GetComponent<SmoothCamera>().target = hero.gameObject.transform;
-        PlayInMap();
+        loadingScreen.SetActive(true);
+        StartCoroutine(GenerateRandom(GameManager._instance.CurrentLevel));
     }
 
     public void PlayInMap()
@@ -43,9 +54,9 @@ public class TurnManager : MonoBehaviour
 
     void ResolveTurn()
     {
-        foreach(Enemy enemy in enemyList)
+        for(int i = 0; i < enemyList.Count; i++)
         {
-             enemy.MovementBehaviour();
+            enemyList[i].MovementBehaviour();
         }
     }
 
@@ -117,62 +128,44 @@ public class TurnManager : MonoBehaviour
                 default: return false;
             }
         }
-        /*
+        
         if (currentController == Controllers.subMenu)
         {
-            switch (inputCommand)
+            switch (gameInput.TakeInput())
             {
-                case "E":
+                case "R":
                     {
-                        Environment.Exit(0);
+                        GameManager._instance.ResetGame();
                         break;
                     }
                 case "Escape":
-                case "C":
-                    {
-                        hero.currentMap.MoveFocus(hero);
-                        whatInControl = 0;
-                        break;
-                    }
                 default:
                     break;
             }
             return false;
         }
-        */
+        
         else return false;
     }
 
 
-    public Map GenerateRandom(int floorNumber)
+    public IEnumerator GenerateRandom(int floorNumber)
     {
         System.Random rnd = new System.Random();
         DungeonStruct dungeonStructure = new DungeonStruct(300,150);
+        yield return null;
         dungeonStructure = SetDungeonSize(floorNumber);
         Map newMap = new Map(dungeonStructure, dungeonStructure.dungeon.Length, dungeonStructure.dungeon[0].Length,this);
         currentMap = newMap;
-        /*
-        display.SetStatUI(1, hero.name);
-        display.SetStatUI(2, hero.hp.ToString());
-        display.SetStatUI(6, gold.ToString());
-        display.SetStatUI(7, enemiesKilled.ToString());
-        */
-        bool displayed = false;
-        /*
-        for (int i = 0; i < 6; i++)
-            if (hero.equipment[i] != null)
-            {
-                display.RefreshItem(i, hero.equipment[i].name);
-                displayed = true;
-                break;
-            }
-        if (!displayed)
-        {
-            display.RefreshItem(-1, "Whatever");
-        }
-        */
         currentController = Controllers.player;
-        return newMap;
+        mainCamera.transform.position = new Vector3(hero.transform.position.x, hero.transform.position.y, -10);
+        mainCamera.GetComponent<SmoothCamera>().target = hero.gameObject.transform;
+        UpdateHeroHealthGUI();
+        UpdateHeroGoldGUI();
+        UpdateHeroKillsGUI();
+        PlayInMap();
+        loadingScreen.GetComponent<LoadingScreen>().FadeOut();
+        yield return null;
     }
 
     private DungeonStruct SetDungeonSize(int floorNumber)
@@ -183,27 +176,62 @@ public class TurnManager : MonoBehaviour
         switch (floorNumber)
         {
             case 1:
-                rowAmmount = 25;
-                columnAmmount = 50;
-                return mapGenerator.CreateDungeon(columnAmmount, rowAmmount, 8);
-            case 2:
                 rowAmmount = 35;
                 columnAmmount = 70;
-                return mapGenerator.CreateDungeon(columnAmmount, rowAmmount, 13);
+                return mapGenerator.CreateDungeon(columnAmmount, rowAmmount, 12);
+            case 2:
+                rowAmmount = 50;
+                columnAmmount = 100;
+                return mapGenerator.CreateDungeon(columnAmmount, rowAmmount, 18);
             case 3:
-                rowAmmount = 45;
-                columnAmmount = 85;
-                return mapGenerator.CreateDungeon(columnAmmount, rowAmmount, 16);
+                rowAmmount = 70;
+                columnAmmount = 120;
+                return mapGenerator.CreateDungeon(columnAmmount, rowAmmount, 24);
             case 4:
-                rowAmmount = 150;
-                columnAmmount = 300;
-                return mapGenerator.CreateDungeon(columnAmmount, rowAmmount, 130);
+                rowAmmount = 80;
+                columnAmmount = 100;
+                return mapGenerator.CreateDungeon(columnAmmount, rowAmmount, 30);
         }
+        rowAmmount = 80;
+        columnAmmount = 100;
         return mapGenerator.CreateDungeon(columnAmmount, rowAmmount, 20); ;
     }
 
     public void RemoveEnemyFromList(Enemy enemy)
     {
+        GameManager._instance.EnemiesKilled++;
         enemyList.Remove(enemy);
+    }
+
+    public void UpdateHeroHealthGUI()
+    {
+        for(int i = 0; i < hero.HealthPoints; i++)
+        {
+            heartContainers[i].GetComponent<HeartContainer>().Activate();
+        }
+        for(int i = hero.HealthPoints; i < heartContainers.Length; i++)
+        {
+            heartContainers[i].GetComponent<HeartContainer>().Deactivate();
+        }
+        
+    }
+
+    public void UpdateHeroDeathGUI()
+    {
+        if(hero.IsDead == true)
+        {
+            deathPanel.SetActive(true);
+            currentController = Controllers.subMenu;
+        }
+    }
+
+    public void UpdateHeroGoldGUI()
+    {
+        goldAmnt.text = "x" + GameManager._instance.CollectedGold;
+    }
+
+    public void UpdateHeroKillsGUI()
+    {
+        enemyKilledAmnt.text = "x" + GameManager._instance.EnemiesKilled;
     }
 }

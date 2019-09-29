@@ -19,14 +19,40 @@ public class PlayerCharacter : Character
         }
     }
 
+    public override int HealthPoints
+    {
+        get => _healthPoints;
+        set
+        {
+            _healthPoints = value;
+            if (OnHealthChange != null)
+                OnHealthChange();
+        }
+    }
+    public delegate void OnHeatlhChangeDelegate();
+    public event OnHeatlhChangeDelegate OnHealthChange;
+
+    private bool _isDead = false;
+    public bool IsDead
+    {
+        get => _isDead;
+        set
+        {
+            _isDead = value;
+            if (OnIsDeathChange != null)
+                OnIsDeathChange();
+        }
+    }
+
+    public delegate void OnDeathChangeDelegate();
+    public event OnDeathChangeDelegate OnIsDeathChange;
+
     public int viewRadius;
 
     // Start is called before the first frame update
     void Start()
     {
-        AttackValue = 1;
-        HealthPoints = 5;
-        viewRadius = 5;
+        LoadDataValues();
         RefreshVision();
     }
 
@@ -43,7 +69,7 @@ public class PlayerCharacter : Character
         if (collisionType == 0)
         {
             OnEmptySpaceCollision(direction);
-            CheckIfTheresItem();
+            CheckIfTheresItemOrSpecial();
         }
 
         if (collisionType == 2)
@@ -106,12 +132,13 @@ public class PlayerCharacter : Character
         OnCharacterMoved();
     }
 
-    private void CheckIfTheresItem()
+    private void CheckIfTheresItemOrSpecial()
     {
         if(!(currentMap.itemsMap[posY][posX]is null))
         {
             currentMap.itemsMap[posY][posX].GetComponent<Item>().OnPlayerInteract(this);
         }
+        currentMap.tileMap[posY][posX].GetComponent<Tile>().OnPlayerInteract(this);
     }
 
     void RefreshVision()
@@ -119,10 +146,29 @@ public class PlayerCharacter : Character
         currentMap.FOV(this);
     }
     
-    
-
     public override void OnDeath()
     {
+        IsDead = true;
         //throw new System.NotImplementedException();
+    }
+
+    public void LoadDataValues()
+    {
+        PlayerDataManager pdm = GameManager._instance.gameObject.GetComponent<PlayerDataManager>();
+        HealthPoints = pdm.playerHealth;
+        AttackValue = pdm.attackValue;
+        viewRadius = pdm.vision;
+
+        equipment = pdm.equipment;
+    }
+
+    public void SetDataValues()
+    {
+        PlayerDataManager pdm = GameManager._instance.gameObject.GetComponent<PlayerDataManager>();
+        pdm.playerHealth=HealthPoints;
+        pdm.attackValue=AttackValue;
+        pdm.vision = viewRadius;
+
+        pdm.equipment=equipment;
     }
 }

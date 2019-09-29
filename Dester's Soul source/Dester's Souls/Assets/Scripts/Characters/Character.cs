@@ -9,10 +9,10 @@ public abstract class Character : MonoBehaviour, IPositionInitializer
         up, down, right, left
     }
 
-    int _healthPoints;
+    protected int _healthPoints;
     private int _attackValue;
     
-    public int HealthPoints { get => _healthPoints;
+    public virtual int HealthPoints { get => _healthPoints;
         set => _healthPoints = value; }
     public int AttackValue { get => _attackValue; protected set => _attackValue = value; }
 
@@ -22,7 +22,7 @@ public abstract class Character : MonoBehaviour, IPositionInitializer
     protected Map currentMap;
     protected TurnManager turnManager;
 
-    private Item[] equipment;
+    protected Item[] equipment;
     // Start is called before the first frame update
     void Awake()
     {

@@ -29,7 +29,7 @@ public class DungeonStruct
     }
 }
 
-public class LevelGenerator : MonoBehaviour
+public class LevelGenerator
 {
     private DungeonStruct dungeonStructure;
     private List<Room> rooms;
@@ -56,7 +56,7 @@ public class LevelGenerator : MonoBehaviour
         rnd = new System.Random();
         dungeonStructure = new DungeonStruct(sizeX, sizeY);
 
-        CreateIfPossible(rnd.Next(4, 8), rnd.Next(4, 8), 0, rnd.Next(10, 16), rnd.Next(10, 16), false);
+        CreateIfPossible(rnd.Next(4, 8), rnd.Next(4, 8), 0, rnd.Next(10, sizeX-10), rnd.Next(10, sizeY-10), false);
         rooms[0].isConnected = true;
         connectedRooms.Add(rooms[0]);
         int selectedRoom;
@@ -111,7 +111,7 @@ public class LevelGenerator : MonoBehaviour
         }
         */
         
-        AStarCorridors aStarCorridors = new AStarCorridors(sizeX, sizeY);
+        AStarCorridors aStarCorridors = new AStarCorridors(sizeX, sizeY, dungeonStructure.dungeon, rooms);
         foreach (Room room in rooms)
         {
             if (!room.isConnected)
