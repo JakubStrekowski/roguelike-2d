@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class PlayerCharacter : Character
 {
-    public int PosX {
+    public int PosX
+    {
         get
         {
             return posX;
@@ -24,6 +25,20 @@ public class PlayerCharacter : Character
         get => _healthPoints;
         set
         {
+            if (OnHealthChangeHeal != null)
+            {
+                if (_healthPoints < value)
+                {
+                    OnHealthChangeHeal();
+                }
+            }
+            if (OnHealthChangeLose != null)
+            {
+                if (_healthPoints > value)
+                {
+                    OnHealthChangeLose();
+                }
+            }
             _healthPoints = value;
             if (OnHealthChange != null)
                 OnHealthChange();
@@ -31,6 +46,12 @@ public class PlayerCharacter : Character
     }
     public delegate void OnHeatlhChangeDelegate();
     public event OnHeatlhChangeDelegate OnHealthChange;
+
+    public delegate void OnHeatlhHealDelegate();
+    public event OnHeatlhHealDelegate OnHealthChangeHeal;
+
+    public delegate void OnHeatlhLoseDelegate();
+    public event OnHeatlhLoseDelegate OnHealthChangeLose;
 
     private bool _isDead = false;
     public bool IsDead
@@ -56,12 +77,7 @@ public class PlayerCharacter : Character
         RefreshVision();
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-    
+
 
     public void Move(Directions direction)
     {
@@ -85,7 +101,7 @@ public class PlayerCharacter : Character
         switch (direction)
         {
             case Directions.up:
-                playerStandardInteraction =(IPlayerStandardInteraction)currentMap.charactersMap[posY + 1][posX].GetComponent(typeof(IPlayerStandardInteraction));
+                playerStandardInteraction = (IPlayerStandardInteraction)currentMap.charactersMap[posY + 1][posX].GetComponent(typeof(IPlayerStandardInteraction));
                 playerStandardInteraction.OnPlayerInteract(this);
                 break;
             case Directions.down:
@@ -101,7 +117,7 @@ public class PlayerCharacter : Character
                 playerStandardInteraction.OnPlayerInteract(this);
                 break;
         }
-        
+
     }
 
     private void OnEmptySpaceCollision(Directions direction)
@@ -111,7 +127,7 @@ public class PlayerCharacter : Character
             case Directions.up:
                 currentMap.ResetVisibility(this);
                 currentMap.SwitchElements(posX, posY, posX, posY + 1);
-                    posY = posY + 1;
+                posY = posY + 1;
                 break;
             case Directions.down:
                 currentMap.ResetVisibility(this);
@@ -134,7 +150,7 @@ public class PlayerCharacter : Character
 
     private void CheckIfTheresItemOrSpecial()
     {
-        if(!(currentMap.itemsMap[posY][posX]is null))
+        if (!(currentMap.itemsMap[posY][posX] is null))
         {
             currentMap.itemsMap[posY][posX].GetComponent<Item>().OnPlayerInteract(this);
         }
@@ -145,7 +161,7 @@ public class PlayerCharacter : Character
     {
         currentMap.FOV(this);
     }
-    
+
     public override void OnDeath()
     {
         IsDead = true;
@@ -165,10 +181,15 @@ public class PlayerCharacter : Character
     public void SetDataValues()
     {
         PlayerDataManager pdm = GameManager._instance.gameObject.GetComponent<PlayerDataManager>();
-        pdm.playerHealth=HealthPoints;
-        pdm.attackValue=AttackValue;
+        pdm.playerHealth = HealthPoints;
+        pdm.attackValue = AttackValue;
         pdm.vision = viewRadius;
 
-        pdm.equipment=equipment;
+        pdm.equipment = equipment;
+    }
+
+    public void UseItem(int equipmentID)
+    {
+        equipment[equipmentID].UseItem(this);
     }
 }

@@ -7,6 +7,7 @@ public abstract class Item : MonoBehaviour, IPlayerStandardInteraction, IPositio
 
     protected int posX;
     protected int posY;
+    protected Map currentMap;
 
     public int itemValue;
 
@@ -28,6 +29,7 @@ public abstract class Item : MonoBehaviour, IPlayerStandardInteraction, IPositio
         {
             source.AddItemToEquipment(this);
             OnItemPickedUpEvent(source);
+            currentMap.DeleteItem(posX, posY);
             Destroy(gameObject);
         }
     }
@@ -37,10 +39,13 @@ public abstract class Item : MonoBehaviour, IPlayerStandardInteraction, IPositio
 
     }
 
+    public abstract void UseItem(Character source);
+
     public void InitializePosition(int x, int y, Map currentMap, TurnManager tm)
     { 
         posX = x;
         posY = y;
+        this.currentMap = currentMap;
     }
 
     public void TurnVisible()

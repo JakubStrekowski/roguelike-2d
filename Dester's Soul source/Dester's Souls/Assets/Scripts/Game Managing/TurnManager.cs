@@ -23,11 +23,15 @@ public class TurnManager : MonoBehaviour
     public GameObject loadingScreen;
     public TextMeshProUGUI goldAmnt;
     public TextMeshProUGUI enemyKilledAmnt;
+    public ScreenEffects screenEffects;
 
     private Map currentMap;
     private bool isHeroAlife;
     private bool hasTurnEnded;
     private Controllers currentController;
+
+
+    private bool playAfterInit = false;
     // Start is called before the first frame update
     void Start()
     {
@@ -213,7 +217,26 @@ public class TurnManager : MonoBehaviour
         {
             heartContainers[i].GetComponent<HeartContainer>().Deactivate();
         }
-        
+        if (hero.HealthPoints < 2)
+        {
+            screenEffects.StartHeroLowHealthEffect();
+        }
+        else
+        {
+            screenEffects.StopHeroLowHealthEffect();
+        }
+    }
+
+    public void HeroHitEffectGUI()
+    {
+        screenEffects.PlayHitEffect();
+    }
+
+    public void HeroHealEffectGUI()
+    {
+        if (!playAfterInit) playAfterInit=true;
+        else screenEffects.PlayHealEffect();
+
     }
 
     public void UpdateHeroDeathGUI()

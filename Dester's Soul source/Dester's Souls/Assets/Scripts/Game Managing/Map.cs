@@ -49,6 +49,9 @@ public class Map
                     {
                         turnManager.hero = charactersMap[rowCounter][columnCounter] as PlayerCharacter;
                         turnManager.hero.OnHealthChange += turnManager.UpdateHeroHealthGUI;
+                        turnManager.hero.OnHealthChangeHeal += turnManager.HeroHealEffectGUI;
+                        turnManager.hero.OnHealthChangeLose += turnManager.HeroHitEffectGUI;
+
                         turnManager.hero.OnIsDeathChange += turnManager.UpdateHeroDeathGUI;
                     }
                     else
@@ -217,13 +220,13 @@ public class Map
         IVisibility visibility;
         for (i = 0; i < player.viewRadius; i++)
         {
-            visibility=(IVisibility)tileMap[(int)oy][(int)ox].GetComponent(typeof(IVisibility));//Set the tile to visible.
+            visibility=(IVisibility)tileMap[(int)oy][(int)ox].GetComponent(typeof(IVisibility));//Set tile to visible.
             visibility.TurnVisible();
             if (charactersMap[(int)oy][(int)ox] != null)
             {
                 if ((int)oy != player.PosY || (int)ox != player.PosX)
                 {
-                    visibility = (IVisibility)charactersMap[(int)oy][(int)ox].GetComponent(typeof(IVisibility));//Set the tile to visible.
+                    visibility = (IVisibility)charactersMap[(int)oy][(int)ox].GetComponent(typeof(IVisibility));//Set enemy to visible.
                     visibility.TurnVisible();
                 }
             }
@@ -231,7 +234,7 @@ public class Map
             if (itemsMap[(int)oy][(int)ox]!=null)
             {
                 
-                visibility = (IVisibility)itemsMap[(int)oy][(int)ox].GetComponent(typeof(IVisibility));//Set the tile to visible.
+                visibility = (IVisibility)itemsMap[(int)oy][(int)ox].GetComponent(typeof(IVisibility));//Set item to visible.
                 visibility.TurnVisible();
             }
             if (tileMap[(int)oy][(int)ox].isPassable==false)
@@ -262,18 +265,23 @@ public class Map
                 {
                     if (i != player.PosY || j != player.PosX)
                     {
-                        visibility = (IVisibility)charactersMap[i][j].GetComponent(typeof(IVisibility));//Set the tile to visible.
+                        visibility = (IVisibility)charactersMap[i][j].GetComponent(typeof(IVisibility));//Set enemy to visible.
                         visibility.TurnInvisible();
                     }
                 }
                 if (itemsMap[i][j]!=null)
                 {
-                    visibility = (IVisibility)itemsMap[i][j].GetComponent(typeof(IVisibility));//Set the tile to visible.
+                    visibility = (IVisibility)itemsMap[i][j].GetComponent(typeof(IVisibility));//Set item to visible.
                     visibility.TurnInvisible();
                 }
                 
             }
         }
+    }
+
+    public void DeleteItem(int posX, int posY)
+    {
+        itemsMap[posY][posX] = null;
     }
 
 }
