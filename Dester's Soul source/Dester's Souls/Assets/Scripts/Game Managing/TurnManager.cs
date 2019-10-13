@@ -15,10 +15,12 @@ public class TurnManager : MonoBehaviour
     public PlayerCharacter hero;
     public List<Enemy> enemyList;
     public Camera mainCamera;
+    public Controllers currentController;
 
 
     //UI
     public Image[] heartContainers;
+    public ItemSlot[] itemSlots;
     public GameObject deathPanel;
     public GameObject loadingScreen;
     public TextMeshProUGUI goldAmnt;
@@ -28,7 +30,6 @@ public class TurnManager : MonoBehaviour
     private Map currentMap;
     private bool isHeroAlife;
     private bool hasTurnEnded;
-    private Controllers currentController;
 
 
     private bool playAfterInit = false;
@@ -91,7 +92,7 @@ public class TurnManager : MonoBehaviour
                         hero.Move(Character.Directions.left);
                     }
                     return true;
-                    /*
+                    
                 case "1":
                     {
                         hero.UseItem(1);
@@ -122,7 +123,7 @@ public class TurnManager : MonoBehaviour
                         hero.UseItem(6);
                         return true;
                     }
-                    */
+                    
                 case "Escape":
                 case "Q":
                     {
@@ -161,14 +162,15 @@ public class TurnManager : MonoBehaviour
         dungeonStructure = SetDungeonSize(floorNumber);
         Map newMap = new Map(dungeonStructure, dungeonStructure.dungeon.Length, dungeonStructure.dungeon[0].Length,this);
         currentMap = newMap;
-        currentController = Controllers.player;
         mainCamera.transform.position = new Vector3(hero.transform.position.x, hero.transform.position.y, -10);
         mainCamera.GetComponent<SmoothCamera>().target = hero.gameObject.transform;
         UpdateHeroHealthGUI();
         UpdateHeroGoldGUI();
         UpdateHeroKillsGUI();
+        UpdateHeroItemSlots();
         PlayInMap();
         loadingScreen.GetComponent<LoadingScreen>().FadeOut();
+        currentController = Controllers.player;
         yield return null;
     }
 
@@ -256,5 +258,20 @@ public class TurnManager : MonoBehaviour
     public void UpdateHeroKillsGUI()
     {
         enemyKilledAmnt.text = "x" + GameManager._instance.EnemiesKilled;
+    }
+
+    public void UpdateHeroItemSlots()
+    {
+        for(int i = 0; i < 6; i++)
+        {
+            if(hero.equipment[i] is null)
+            {
+                itemSlots[i].DisableItem();
+            }
+            else
+            {
+                itemSlots[i].EnableItem(hero.equipment[i].GetComponent<SpriteRenderer>().sprite);
+            }
+        }
     }
 }

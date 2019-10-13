@@ -51,7 +51,7 @@ public class Map
                         turnManager.hero.OnHealthChange += turnManager.UpdateHeroHealthGUI;
                         turnManager.hero.OnHealthChangeHeal += turnManager.HeroHealEffectGUI;
                         turnManager.hero.OnHealthChangeLose += turnManager.HeroHitEffectGUI;
-
+                        turnManager.hero.OnItemChange += turnManager.UpdateHeroItemSlots;
                         turnManager.hero.OnIsDeathChange += turnManager.UpdateHeroDeathGUI;
                     }
                     else

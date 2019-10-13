@@ -29,6 +29,6 @@ public class PlayerDataManager : MonoBehaviour
         attackValue=1;
         vision = 5;
 
-    equipment = new Item[5];
+    equipment = new Item[6];
     }
 }

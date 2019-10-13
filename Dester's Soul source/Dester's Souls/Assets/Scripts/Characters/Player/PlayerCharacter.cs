@@ -25,6 +25,17 @@ public class PlayerCharacter : Character
         get => _healthPoints;
         set
         {
+            if (value > 10)
+            {
+                value = 10;
+            }
+            else
+            {
+                if (value < 0)
+                {
+                    value = 0;
+                }
+            }
             if (OnHealthChangeHeal != null)
             {
                 if (_healthPoints < value)
@@ -40,8 +51,7 @@ public class PlayerCharacter : Character
                 }
             }
             _healthPoints = value;
-            if (OnHealthChange != null)
-                OnHealthChange();
+            OnHealthChange?.Invoke();
         }
     }
     public delegate void OnHeatlhChangeDelegate();
@@ -60,20 +70,28 @@ public class PlayerCharacter : Character
         set
         {
             _isDead = value;
-            if (OnIsDeathChange != null)
-                OnIsDeathChange();
+            OnIsDeathChange?.Invoke();
         }
     }
 
     public delegate void OnDeathChangeDelegate();
     public event OnDeathChangeDelegate OnIsDeathChange;
 
+    public delegate void OnItemChangeDelegate();
+    public event OnItemChangeDelegate OnItemChange;
+
     public int viewRadius;
+
+    private void Awake()
+    {
+        equipment = new Item[6];
+    }
 
     // Start is called before the first frame update
     void Start()
     {
         LoadDataValues();
+        OnItemChange?.Invoke();
         RefreshVision();
     }
 
@@ -153,6 +171,7 @@ public class PlayerCharacter : Character
         if (!(currentMap.itemsMap[posY][posX] is null))
         {
             currentMap.itemsMap[posY][posX].GetComponent<Item>().OnPlayerInteract(this);
+            OnItemChange?.Invoke();
         }
         currentMap.tileMap[posY][posX].GetComponent<Tile>().OnPlayerInteract(this);
     }
@@ -186,10 +205,35 @@ public class PlayerCharacter : Character
         pdm.vision = viewRadius;
 
         pdm.equipment = equipment;
+
+        foreach(Item item in equipment)
+        {
+            if(!(item is null))
+            {
+                DontDestroyOnLoad(item.gameObject);
+            }
+        }
     }
+
+    
 
     public void UseItem(int equipmentID)
     {
-        equipment[equipmentID].UseItem(this);
+        if(!( equipment[equipmentID-1] is null))
+        {
+            equipment[equipmentID - 1].UseItem(this);
+            if(equipment[equipmentID - 1] is Consumable)
+            {
+                Consumable cons = equipment[equipmentID - 1].GetComponent<Consumable>();
+                if (cons.numberOfUses == 0)
+                {
+                    equipment[equipmentID - 1] = null;
+                    Destroy(cons.gameObject);
+                }
+            }
+            OnItemChange?.Invoke();
+        }
     }
+
+
 }

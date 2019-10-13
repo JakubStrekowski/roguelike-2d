@@ -30,7 +30,7 @@ public abstract class Item : MonoBehaviour, IPlayerStandardInteraction, IPositio
             source.AddItemToEquipment(this);
             OnItemPickedUpEvent(source);
             currentMap.DeleteItem(posX, posY);
-            Destroy(gameObject);
+            transform.position = new Vector3(-10000, -10000);
         }
     }
 

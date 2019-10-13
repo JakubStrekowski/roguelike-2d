@@ -10,9 +10,5 @@ public class HealthPotion : Consumable
     {
         source.HealthPoints += healAmmount;
         numberOfUses--;
-        if (numberOfUses == 0)
-        {
-            Destroy(this);
-        }
     }
 }

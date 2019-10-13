@@ -22,11 +22,11 @@ public abstract class Character : MonoBehaviour, IPositionInitializer
     protected Map currentMap;
     protected TurnManager turnManager;
 
-    protected Item[] equipment;
+    public Item[] equipment;
     // Start is called before the first frame update
     void Awake()
     {
-        equipment = new Item[5];
+        equipment = new Item[6];
     }
 
     // Update is called once per frame
