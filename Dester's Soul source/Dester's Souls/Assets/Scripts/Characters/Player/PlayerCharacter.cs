@@ -86,7 +86,6 @@ public class PlayerCharacter : Character
     {
         equipment = new Item[6];
         characterEffect = GetComponentInChildren<CharacterEffectPlayer>();
-
     }
 
     // Start is called before the first frame update

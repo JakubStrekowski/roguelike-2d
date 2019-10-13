@@ -21,6 +21,7 @@ public abstract class Character : MonoBehaviour, IPositionInitializer
 
     protected Animator animator;
     protected CharacterEffectPlayer characterEffect;
+    public ParticleSystem particleSystem;
 
     protected Map currentMap;
     protected TurnManager turnManager;
@@ -43,11 +44,20 @@ public abstract class Character : MonoBehaviour, IPositionInitializer
     {
         HealthPoints -= damageAmmount;
         characterEffect.PlayHurtAnimation();
+        //StartCoroutine("StartBleeding");
         if (HealthPoints <= 0)
         {
             OnDeath();
         }
     }
+
+    IEnumerator StartBleeding()
+    {
+        particleSystem.Play();
+        yield return new WaitForSeconds(3f);
+        particleSystem.Stop();
+    }
+
 
     public virtual void InitializePosition(int posX, int posY,Map currentMap,TurnManager turnManager)
     {
