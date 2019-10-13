@@ -57,6 +57,7 @@ public class TurnManager : MonoBehaviour
         }
     }
 
+
     void ResolveTurn()
     {
         for(int i = 0; i < enemyList.Count; i++)
@@ -163,7 +164,7 @@ public class TurnManager : MonoBehaviour
         Map newMap = new Map(dungeonStructure, dungeonStructure.dungeon.Length, dungeonStructure.dungeon[0].Length,this);
         currentMap = newMap;
         mainCamera.transform.position = new Vector3(hero.transform.position.x, hero.transform.position.y, -10);
-        mainCamera.GetComponent<SmoothCamera>().target = hero.gameObject.transform;
+        mainCamera.GetComponent<SmoothCamera>().target = hero.gameObject.transform.GetChild(0);
         UpdateHeroHealthGUI();
         UpdateHeroGoldGUI();
         UpdateHeroKillsGUI();

@@ -19,6 +19,9 @@ public abstract class Character : MonoBehaviour, IPositionInitializer
     protected int posX;
     protected int posY;
 
+    protected Animator animator;
+    protected CharacterEffectPlayer characterEffect;
+
     protected Map currentMap;
     protected TurnManager turnManager;
 
@@ -39,6 +42,7 @@ public abstract class Character : MonoBehaviour, IPositionInitializer
     public void OnTakenDamage(int damageAmmount)
     {
         HealthPoints -= damageAmmount;
+        characterEffect.PlayHurtAnimation();
         if (HealthPoints <= 0)
         {
             OnDeath();
@@ -77,6 +81,15 @@ public abstract class Character : MonoBehaviour, IPositionInitializer
 
     protected void OnCharacterMoved()
     {
+        StartCoroutine("AwaitForAnimation");
+    }
+
+    IEnumerator AwaitForAnimation()
+    {
+        yield return new WaitForSeconds(0.20f);
         gameObject.transform.position = new Vector3(posX, posY, gameObject.transform.position.z);
+        animator.Play("HeroIdle");
+        gameObject.transform.GetChild(0).position = Vector3.zero;
+        
     }
 }

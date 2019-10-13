@@ -14,7 +14,9 @@ public abstract class Enemy : Character, IPlayerStandardInteraction, IVisibility
     protected SpriteRenderer spriteRenderer;
     void Awake()
     {
-        spriteRenderer = GetComponent<SpriteRenderer>();
+        spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+        animator = GetComponentInChildren<Animator>();
+        characterEffect = GetComponentInChildren<CharacterEffectPlayer>();
         TurnInvisible();
     }
 
@@ -32,6 +34,7 @@ public abstract class Enemy : Character, IPlayerStandardInteraction, IVisibility
                 {
                     currentMap.SwitchElements(posX, posY, targetPositionX, targetPositionY);
                     posY = posY + 1;
+                    animator.Play("HeroMoveUp");
                     OnCharacterMoved();
                     return true;
                 }
@@ -53,6 +56,7 @@ public abstract class Enemy : Character, IPlayerStandardInteraction, IVisibility
                 {
                     currentMap.SwitchElements(posX, posY, targetPositionX, targetPositionY);
                     posY = posY - 1;
+                    animator.Play("HeroMoveDown");
                     OnCharacterMoved();
                     return true;
                 }
@@ -74,6 +78,7 @@ public abstract class Enemy : Character, IPlayerStandardInteraction, IVisibility
                 {
                     currentMap.SwitchElements(posX, posY, targetPositionX, targetPositionY);
                     posX = posX + 1;
+                    animator.Play("HeroMoveRight");
                     OnCharacterMoved();
                     return true;
                 }
@@ -96,6 +101,7 @@ public abstract class Enemy : Character, IPlayerStandardInteraction, IVisibility
                 {
                     currentMap.SwitchElements(posX, posY, targetPositionX, targetPositionY);
                     posX = posX - 1;
+                    animator.Play("HeroMoveLeft");
                     OnCharacterMoved();
                     return true;
                 }

@@ -85,6 +85,8 @@ public class PlayerCharacter : Character
     private void Awake()
     {
         equipment = new Item[6];
+        characterEffect = GetComponentInChildren<CharacterEffectPlayer>();
+
     }
 
     // Start is called before the first frame update
@@ -92,6 +94,7 @@ public class PlayerCharacter : Character
     {
         LoadDataValues();
         OnItemChange?.Invoke();
+        animator = GetComponentInChildren<Animator>();
         RefreshVision();
     }
 
@@ -145,21 +148,25 @@ public class PlayerCharacter : Character
             case Directions.up:
                 currentMap.ResetVisibility(this);
                 currentMap.SwitchElements(posX, posY, posX, posY + 1);
+                animator.Play("HeroMoveUp");
                 posY = posY + 1;
                 break;
             case Directions.down:
                 currentMap.ResetVisibility(this);
                 currentMap.SwitchElements(posX, posY, posX, posY - 1);
+                animator.Play("HeroMoveDown");
                 posY = posY - 1;
                 break;
             case Directions.right:
                 currentMap.ResetVisibility(this);
                 currentMap.SwitchElements(posX, posY, posX + 1, posY);
+                animator.Play("HeroMoveRight");
                 posX = posX + 1;
                 break;
             case Directions.left:
                 currentMap.ResetVisibility(this);
                 currentMap.SwitchElements(posX, posY, posX - 1, posY);
+                animator.Play("HeroMoveLeft");
                 posX = posX - 1;
                 break;
         }
