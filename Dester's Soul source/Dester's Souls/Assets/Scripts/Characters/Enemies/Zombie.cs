@@ -22,7 +22,7 @@ public class Zombie : Enemy
         rnd = new System.Random(posX * posY);
         HealthPoints = 3;
         AttackValue = 1;
-
+        enemyHealthRepresentation.maxHealth = HealthPoints;
         int random = rnd.Next(2);
         if (random == 0)
         {

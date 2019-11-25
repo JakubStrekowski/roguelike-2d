@@ -58,7 +58,12 @@ public class GameInput:MonoBehaviour
             KeyUsed();
             return "ArrowLeft";
         }
-        if(Input.GetKey(KeyCode.Alpha1)|| Input.GetKeyDown(KeyCode.Keypad1))
+        if (Input.GetKey(KeyCode.Space))
+        {
+            KeyUsed();
+            return "Space";
+        }
+        if (Input.GetKey(KeyCode.Alpha1)|| Input.GetKeyDown(KeyCode.Keypad1))
         {
             KeyUsed();
             return "1";

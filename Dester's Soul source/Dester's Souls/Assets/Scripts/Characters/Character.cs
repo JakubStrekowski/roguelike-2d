@@ -16,14 +16,14 @@ public abstract class Character : MonoBehaviour, IPositionInitializer
         set => _healthPoints = value; }
     public int AttackValue { get => _attackValue; protected set => _attackValue = value; }
 
-    protected int posX;
-    protected int posY;
+    public int posX;
+    public int posY;
 
     protected Animator animator;
     protected CharacterEffectPlayer characterEffect;
-    public ParticleSystem particleSystem;
+    public GameObject particleSystem;
 
-    protected Map currentMap;
+    public Map currentMap;
     protected TurnManager turnManager;
 
     public Item[] equipment;
@@ -40,22 +40,21 @@ public abstract class Character : MonoBehaviour, IPositionInitializer
         GameObject.Destroy(gameObject);
     }
 
-    public void OnTakenDamage(int damageAmmount)
+    public virtual void OnTakenDamage(int damageAmmount)
     {
         HealthPoints -= damageAmmount;
         characterEffect.PlayHurtAnimation();
-        //StartCoroutine("StartBleeding");
+        StartCoroutine("StartBleeding");
         if (HealthPoints <= 0)
         {
             OnDeath();
         }
     }
 
-    IEnumerator StartBleeding()
+    protected IEnumerator StartBleeding()
     {
-        particleSystem.Play();
-        yield return new WaitForSeconds(3f);
-        particleSystem.Stop();
+        Instantiate(particleSystem, this.transform.position, Quaternion.identity);
+        yield return new WaitForSeconds(0.1f);
     }
 
 

@@ -93,7 +93,11 @@ public class TurnManager : MonoBehaviour
                         hero.Move(Character.Directions.left);
                     }
                     return true;
-                    
+
+                case "Space":
+                    hero.RefreshVision();
+                    return true;
+
                 case "1":
                     {
                         hero.UseItem(1);

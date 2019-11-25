@@ -7,6 +7,9 @@ public class Map
     public Tile[][] tileMap;
     public Character[][] charactersMap;
     public Item[][] itemsMap;
+    public int[][] terrainCosts;
+    public EnemyPathFindingAStar enemyPathFindingA;
+
     int mapRowLimit;
     int mapColumnLimit;
 
@@ -19,17 +22,26 @@ public class Map
         this.tileMap = new Tile[mapRowLimit][];
         this.charactersMap = new Character[mapRowLimit][];
         this.itemsMap = new Item[mapRowLimit][];
+        terrainCosts = new int[mapRowLimit][];
         int rowCounter = 0;
 
         foreach (int[] intRow in dungeonStructure.dungeon)
         {
             this.tileMap[rowCounter] = new Tile[mapColumnLimit];
+            terrainCosts[rowCounter] = new int[mapColumnLimit];
             int columnCounter = 0;
             foreach (int integer in intRow)
             {
                  this.tileMap[rowCounter][columnCounter] =
                     GameManager._instance.tileFactory.GetTile(integer, columnCounter, rowCounter, this).GetComponent<Tile>();
-              
+                if (integer < 10)
+                {
+                    terrainCosts[rowCounter][columnCounter] = 1;
+                }
+                else
+                {
+                    terrainCosts[rowCounter][columnCounter] = 99999;
+                }
                 columnCounter++;
             }
             rowCounter++;
@@ -79,6 +91,7 @@ public class Map
             }
             rowCounter++;
         }
+        enemyPathFindingA = new EnemyPathFindingAStar(ColumnAmmount, rowAmmount); ;
     }
 
     public Tile GiveNeighbourTile(int posX, int posY, Character.Directions direction) 
@@ -228,6 +241,8 @@ public class Map
                 {
                     visibility = (IVisibility)charactersMap[(int)oy][(int)ox].GetComponent(typeof(IVisibility));//Set enemy to visible.
                     visibility.TurnVisible();
+                    Enemy enemy = charactersMap[(int)oy][(int)ox] as Enemy;
+                    enemy.SetHeroLastPosition(player.PosX, player.PosY);
                 }
             }
             
@@ -259,24 +274,87 @@ public class Map
             for(int j = beginX; j < endX; j++)
             {
                 
-                visibility = (IVisibility)tileMap[i][j].GetComponent(typeof(IVisibility));//Set the tile to visible.
+                visibility = (IVisibility)tileMap[i][j].GetComponent(typeof(IVisibility));//Set the tile to invisible.
                 visibility.TurnInvisible();
                 if (charactersMap[i][j]!=null)
                 {
                     if (i != player.PosY || j != player.PosX)
                     {
-                        visibility = (IVisibility)charactersMap[i][j].GetComponent(typeof(IVisibility));//Set enemy to visible.
+                        visibility = (IVisibility)charactersMap[i][j].GetComponent(typeof(IVisibility));//Set enemy to invisible.
                         visibility.TurnInvisible();
                     }
                 }
                 if (itemsMap[i][j]!=null)
                 {
-                    visibility = (IVisibility)itemsMap[i][j].GetComponent(typeof(IVisibility));//Set item to visible.
+                    visibility = (IVisibility)itemsMap[i][j].GetComponent(typeof(IVisibility));//Set item to invisible.
                     visibility.TurnInvisible();
                 }
                 
             }
         }
+    }
+
+    public int[][] GenerateTruePathCosts(int beginX, int beginY, int endX, int endY, Enemy context)
+    {
+        if (beginX < 0) beginX = 0;
+        if (endX > tileMap[0].Length) endX = tileMap[0].Length;
+        if (beginY < 0) beginY = 0;
+        if (endY > tileMap.Length) endY = tileMap.Length;
+        if (context is Rat)
+        {
+            Rat rat = (Rat)context;
+            rat.alliesNearby=0;
+        }
+        int[][] costs = new int[endY - beginY][];
+        for(int i = 0; i < endY - beginY; i++)
+        {
+            costs[i] = new int[endX - beginX];
+            for (int j=0; j < endX - beginX; j++)
+            {
+                if (!tileMap[i + beginY][j+beginX].isPassable)
+                {
+                    costs[i][j] = 99999;
+                    continue;
+                }
+                if(!(charactersMap[i + beginY][j + beginX] is null))
+                {
+                    if(charactersMap[i + beginY][j + beginX] is PlayerCharacter)
+                    {
+                        costs[i][j] = 0;
+                    }
+                    else
+                    {
+                        if(!(context == charactersMap[i + beginY][j + beginX]))
+                        {
+                            if (context is Rat)
+                            {
+                                Rat rat = (Rat)context;
+                                rat.alliesNearby++;
+                            }
+                            costs[i][j] = 9999;
+                        }
+                        
+                    }
+                    continue;
+                }
+                else
+                {
+                    costs[i][j] = 1;
+                }
+            }
+        }
+        Debug.Log("Weights for: " + beginX + 5 + " " + beginY + 5);
+        foreach(int[] row in costs)
+        {
+            string s="";
+            foreach(int weight in row)
+            {
+                s += weight.ToString() + " ";
+            }
+            Debug.Log(s);
+        }
+
+        return costs;
     }
 
     public void DeleteItem(int posX, int posY)

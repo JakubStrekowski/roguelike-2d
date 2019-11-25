@@ -182,7 +182,7 @@ public class PlayerCharacter : Character
         currentMap.tileMap[posY][posX].GetComponent<Tile>().OnPlayerInteract(this);
     }
 
-    void RefreshVision()
+    public void RefreshVision()
     {
         currentMap.FOV(this);
     }

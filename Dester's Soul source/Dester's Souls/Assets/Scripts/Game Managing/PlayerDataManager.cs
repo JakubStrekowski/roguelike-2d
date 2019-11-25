@@ -29,6 +29,15 @@ public class PlayerDataManager : MonoBehaviour
         attackValue=1;
         vision = 5;
 
+        for(int i = 0; i < equipment.Length; i++)
+        {
+            if (equipment[i] != null)
+            {
+                GameObject.Destroy(equipment[i].gameObject);
+                equipment[i] = null;
+            }
+        }
+
     equipment = new Item[6];
     }
 }

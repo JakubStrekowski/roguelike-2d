@@ -16,13 +16,11 @@ public class CharacterEffectPlayer : MonoBehaviour
     {
         spriteRenderer.enabled = true;
         StartCoroutine("AnimateHurtEffect");
-        Debug.Log("Animation statred");
     }
     public IEnumerator AnimateHurtEffect()
     {
         animator.Play("HurtEffectPlay");
         yield return new WaitForSeconds(1f);
-        Debug.Log("Animation ended");
         spriteRenderer.enabled = false;
     }
 }

@@ -7,17 +7,40 @@ public abstract class Enemy : Character, IPlayerStandardInteraction, IVisibility
 {
     public int speed;
     public int giveGold;
-    
+
+    public EnemyHealthRepresentation enemyHealthRepresentation;
 
     public abstract void MovementBehaviour();
 
+    protected int lastHeroPosX;
+    protected int lastHeroPosY;
     protected SpriteRenderer spriteRenderer;
+
+    public int LastHeroPosX { get => lastHeroPosX;}
+    public int LastHeroPosY { get => lastHeroPosY;}
+    public int memoryTurns;
+
     void Awake()
     {
         spriteRenderer = GetComponentInChildren<SpriteRenderer>();
         animator = GetComponentInChildren<Animator>();
         characterEffect = GetComponentInChildren<CharacterEffectPlayer>();
-        TurnInvisible();
+        lastHeroPosX = -1;
+        lastHeroPosY = -1;
+        memoryTurns = 0;
+    TurnInvisible();
+    }
+
+    public override void OnTakenDamage(int damageAmmount)
+    {
+        HealthPoints -= damageAmmount;
+        enemyHealthRepresentation.UpdateEnemyHealth(HealthPoints);
+        characterEffect.PlayHurtAnimation();
+        StartCoroutine("StartBleeding");
+        if (HealthPoints <= 0)
+        {
+            OnDeath();
+        }
     }
 
     public bool MoveDirection(Directions direction)
@@ -124,7 +147,7 @@ public abstract class Enemy : Character, IPlayerStandardInteraction, IVisibility
         OnTakenDamage(source.AttackValue);
     }
 
-    public void InitializePosition(int posX, int posY, Map currentMap, TurnManager turnManager)
+    public override void InitializePosition(int posX, int posY, Map currentMap, TurnManager turnManager)
     {
         this.posX = posX;
         this.posY = posY;
@@ -144,10 +167,25 @@ public abstract class Enemy : Character, IPlayerStandardInteraction, IVisibility
     public void TurnVisible()
     {
         spriteRenderer.enabled = true;
+        enemyHealthRepresentation.UpdateEnemyHealth(HealthPoints);
     }
 
     public void TurnInvisible()
     {
+        enemyHealthRepresentation.HideAllElements();
         spriteRenderer.enabled = false;
+        if (memoryTurns > 0) memoryTurns--;
+        else
+        {
+            lastHeroPosX = -1;
+            lastHeroPosY = -1;
+        }
+    }
+
+    public void SetHeroLastPosition(int x, int y)
+    {
+        memoryTurns = 3;
+        lastHeroPosX = x;
+        lastHeroPosY = y;
     }
 }
