@@ -19,10 +19,14 @@ public class PlayerDataManager : MonoBehaviour
     public int attackValue=1;
     public int vision = 5;
 
+    public int previousMusicID;
+
     public Item[] equipment;
 
     public void ResetValues()
     {
+        previousMusicID = 0;
+
         playerHealth = 4;
         gold = 0;
         enemyKilled = 0;

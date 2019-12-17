@@ -8,7 +8,7 @@ public class TurnManager : MonoBehaviour
 {
     public enum Controllers
     {
-        player,mainMenu,subMenu,skillTargetting
+        player,mainMenu,subMenu,skillTargetting,gameLoading
     }
 
     public GameInput gameInput;
@@ -42,6 +42,7 @@ public class TurnManager : MonoBehaviour
         isHeroAlife = true;
         hasTurnEnded = true;
         loadingScreen.SetActive(true);
+        currentController = Controllers.gameLoading;
         StartCoroutine(GenerateRandom(GameManager._instance.CurrentLevel));
     }
 

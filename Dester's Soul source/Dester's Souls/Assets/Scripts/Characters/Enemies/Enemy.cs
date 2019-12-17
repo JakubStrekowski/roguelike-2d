@@ -8,6 +8,8 @@ public abstract class Enemy : Character, IPlayerStandardInteraction, IVisibility
     public int speed;
     public int giveGold;
 
+    public AudioClip dieSound;
+
     public EnemyHealthRepresentation enemyHealthRepresentation;
 
     public abstract void MovementBehaviour();
@@ -39,7 +41,12 @@ public abstract class Enemy : Character, IPlayerStandardInteraction, IVisibility
         StartCoroutine("StartBleeding");
         if (HealthPoints <= 0)
         {
+            AudioSource.PlayClipAtPoint(dieSound, turnManager.mainCamera.transform.position, GameManager._instance.GetComponent<GameDataManager>().SoundsVolume);
             OnDeath();
+        }
+        else
+        {
+            AudioSource.PlayClipAtPoint(gotHitSound, turnManager.mainCamera.transform.position, GameManager._instance.GetComponent<GameDataManager>().SoundsVolume);
         }
     }
 

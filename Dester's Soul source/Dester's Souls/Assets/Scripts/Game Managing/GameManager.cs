@@ -53,6 +53,11 @@ public class GameManager : MonoBehaviour
         CurrentLevel = 1;
     }
 
+    public void LoadScene(int sceneID)
+    {
+        SceneManager.LoadScene(sceneID);
+    }
+
     public void GoDownStairs()
     {
         CurrentLevel++;

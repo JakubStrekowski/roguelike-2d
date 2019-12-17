@@ -22,6 +22,7 @@ public abstract class Character : MonoBehaviour, IPositionInitializer
     protected Animator animator;
     protected CharacterEffectPlayer characterEffect;
     public GameObject particleSystem;
+    public AudioClip gotHitSound;
 
     public Map currentMap;
     protected TurnManager turnManager;
@@ -48,6 +49,10 @@ public abstract class Character : MonoBehaviour, IPositionInitializer
         if (HealthPoints <= 0)
         {
             OnDeath();
+        }
+        else
+        {
+            AudioSource.PlayClipAtPoint(gotHitSound, turnManager.mainCamera.transform.position, GameManager._instance.GetComponent<GameDataManager>().SoundsVolume);
         }
     }
 

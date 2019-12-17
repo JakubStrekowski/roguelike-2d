@@ -13,4 +13,9 @@ public class SceneManagementUI : MonoBehaviour
     {
         GameManager._instance.ExitGame();
     }
+
+    public void SelectScene(int sceneID)
+    {
+        GameManager._instance.LoadScene(sceneID);
+    }
 }

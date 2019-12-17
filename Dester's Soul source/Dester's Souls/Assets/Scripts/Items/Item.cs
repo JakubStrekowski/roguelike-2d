@@ -4,10 +4,12 @@ using UnityEngine;
 
 public abstract class Item : MonoBehaviour, IPlayerStandardInteraction, IPositionInitializer, IVisibility
 {
+    public AudioClip onItemPickupSnd;
 
     protected int posX;
     protected int posY;
     protected Map currentMap;
+    protected TurnManager turnManager;
 
     public int itemValue;
 
@@ -31,6 +33,7 @@ public abstract class Item : MonoBehaviour, IPlayerStandardInteraction, IPositio
             OnItemPickedUpEvent(source);
             currentMap.DeleteItem(posX, posY);
             transform.position = new Vector3(-10000, -10000);
+            AudioSource.PlayClipAtPoint(onItemPickupSnd, turnManager.mainCamera.transform.position, GameManager._instance.GetComponent<GameDataManager>().SoundsVolume);
         }
     }
 
@@ -46,6 +49,7 @@ public abstract class Item : MonoBehaviour, IPlayerStandardInteraction, IPositio
         posX = x;
         posY = y;
         this.currentMap = currentMap;
+        this.turnManager = tm;
     }
 
     public void TurnVisible()

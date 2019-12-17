@@ -8,19 +8,15 @@ public class TileFactory : MonoBehaviour
 
     TurnManager turnManager;
 
+
+
     private void OnLevelWasLoaded(int level)
     {
-        if (level == 0)
+        if (level == 1)
         {
             turnManager = GameObject.Find("DungeonManager").GetComponent<TurnManager>();
             Debug.Log(turnManager.ToString());
         }
-    }
-
-    private void Start()
-    {
-        turnManager = GameObject.Find("DungeonManager").GetComponent<TurnManager>();
-        Debug.Log(turnManager.ToString());
     }
 
     /*Tile Factory tile ids:
