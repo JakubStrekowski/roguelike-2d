@@ -478,7 +478,7 @@ public class LevelGenerator
             sizeY = sy;
             isConnected = false;
             floorVariant = Random.Range(0, 6);
-            wallVariant = Random.Range(10, 12);
+            wallVariant = Random.Range(10, 13);
         }
         public Point PointFromWall(int direction)
         {

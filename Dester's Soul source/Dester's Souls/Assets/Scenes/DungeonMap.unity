@@ -206,7 +206,7 @@ MonoBehaviour:
   m_outlineColor:
     serializedVersion: 2
     rgba: 4278190080
-  m_fontSize: 14
+  m_fontSize: 16.35
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -4630,7 +4630,7 @@ MonoBehaviour:
   m_outlineColor:
     serializedVersion: 2
     rgba: 4278190080
-  m_fontSize: 14
+  m_fontSize: 16.35
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -5172,7 +5172,7 @@ MonoBehaviour:
   m_outlineColor:
     serializedVersion: 2
     rgba: 4278190080
-  m_fontSize: 18.25
+  m_fontSize: 22.65
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -5954,7 +5954,7 @@ PrefabInstance:
         type: 3}
       propertyPath: tilePalette.Array.data[12]
       value: 
-      objectReference: {fileID: 8888121173029674725, guid: c1eef7af57f99334caeee5aaa5fc1901,
+      objectReference: {fileID: 8235372014820814775, guid: cb7fec3b125f778458de8356d068f00c,
         type: 3}
     - target: {fileID: 2536297973553963297, guid: 941ab0795a66a4946989b7f5f30c87fb,
         type: 3}

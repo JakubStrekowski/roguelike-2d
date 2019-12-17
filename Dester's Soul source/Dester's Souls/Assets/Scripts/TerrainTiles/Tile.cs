@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class Tile : MonoBehaviour, IPositionInitializer, IVisibility
 {
+    protected Color spriteColor;
+    protected Map currentMap;
+
     protected int posX;
     protected int posY;
     protected bool wasVisited;
@@ -21,13 +24,21 @@ public class Tile : MonoBehaviour, IPositionInitializer, IVisibility
     {
         posX = x;
         posY = y;
+        if (isPassable)
+        {
+            spriteColor = currentMap.floorColor;
+        }
+        else
+        {
+            spriteColor = currentMap.wallsColor;
+        }
     }
 
     public void TurnVisible()
     {
         wasVisited = true;
         sr.enabled = true;
-        sr.color = new Color(1f, 1f, 1f);
+        sr.color = spriteColor;
     }
 
     public void TurnInvisible()

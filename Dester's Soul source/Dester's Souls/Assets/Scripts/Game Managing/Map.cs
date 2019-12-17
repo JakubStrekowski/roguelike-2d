@@ -9,6 +9,8 @@ public class Map
     public Item[][] itemsMap;
     public int[][] terrainCosts;
     public EnemyPathFindingAStar enemyPathFindingA;
+    public Color wallsColor;
+    public Color floorColor;
 
     int mapRowLimit;
     int mapColumnLimit;
@@ -24,6 +26,9 @@ public class Map
         this.itemsMap = new Item[mapRowLimit][];
         terrainCosts = new int[mapRowLimit][];
         int rowCounter = 0;
+
+        wallsColor = new Color(Random.Range(0.4f, 0.75f), Random.Range(0.4f, 0.75f), Random.Range(0.4f, 0.75f));
+        floorColor = new Color(Random.Range(0.3f, 0.95f), Random.Range(0.3f, 0.95f), Random.Range(0.3f, 0.95f));
 
         foreach (int[] intRow in dungeonStructure.dungeon)
         {
