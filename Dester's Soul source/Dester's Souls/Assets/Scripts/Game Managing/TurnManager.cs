@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -26,11 +27,12 @@ public class TurnManager : MonoBehaviour
     public TextMeshProUGUI goldAmnt;
     public TextMeshProUGUI enemyKilledAmnt;
     public ScreenEffects screenEffects;
+    public GameObject debugLogPanel;
 
     private Map currentMap;
     private bool isHeroAlife;
     private bool hasTurnEnded;
-
+    private DebugLogManager debugLogManager;
 
     private bool playAfterInit = false;
     // Start is called before the first frame update
@@ -42,8 +44,13 @@ public class TurnManager : MonoBehaviour
         isHeroAlife = true;
         hasTurnEnded = true;
         loadingScreen.SetActive(true);
+        debugLogManager = GetComponent<DebugLogManager>();
         currentController = Controllers.gameLoading;
         StartCoroutine(GenerateRandom(GameManager._instance.CurrentLevel));
+        if (GameManager._instance.GetComponent<GameDataManager>().DebugConsoleEnabled == 0)
+        {
+            debugLogPanel.SetActive(false);
+        }
     }
 
     public void PlayInMap()
@@ -162,6 +169,7 @@ public class TurnManager : MonoBehaviour
 
     public IEnumerator GenerateRandom(int floorNumber)
     {
+        Stopwatch stopWatch = Stopwatch.StartNew();
         System.Random rnd = new System.Random();
         DungeonStruct dungeonStructure = new DungeonStruct(300,150);
         yield return null;
@@ -177,6 +185,8 @@ public class TurnManager : MonoBehaviour
         PlayInMap();
         loadingScreen.GetComponent<LoadingScreen>().FadeOut();
         currentController = Controllers.player;
+        stopWatch.Stop();
+        debugLogManager.AddLog("World generated in: " + stopWatch.Elapsed.TotalMilliseconds.ToString() + "ms");
         yield return null;
     }
 
@@ -279,5 +289,11 @@ public class TurnManager : MonoBehaviour
                 itemSlots[i].EnableItem(hero.equipment[i].GetComponent<SpriteRenderer>().sprite);
             }
         }
+    }
+
+    public void AddLog(string message)
+    {
+        if (GameManager._instance.GetComponent<GameDataManager>().DebugConsoleEnabled == 1)
+            debugLogManager.AddLog(message);
     }
 }

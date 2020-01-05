@@ -13,14 +13,15 @@ public class GameDataManager : MonoBehaviour
     {
         musicVolume = PlayerPrefs.GetFloat("MusicVolume", 0.5f);
         soundVolume = PlayerPrefs.GetFloat("SoundVolume", 0.5f);
+        debugConsoleEnabled = PlayerPrefs.GetInt("DebugMode", 0);
     }
 
 
-    private bool debugConsoleEnabled;
+    private int debugConsoleEnabled;
     private float soundVolume;
     private float musicVolume;
 
-    public bool DebugConsoleEnabled { get => debugConsoleEnabled; set => debugConsoleEnabled = value; }
+    public int DebugConsoleEnabled { get => debugConsoleEnabled; set => debugConsoleEnabled = value; }
     public float MusicVolume { get => musicVolume; }
     public float SoundsVolume { get => soundVolume; }
 
@@ -38,5 +39,12 @@ public class GameDataManager : MonoBehaviour
         soundVolume = value;
         PlayerPrefs.Save();
 
+    }
+
+    public void SetDebugMode(int value)
+    {
+        PlayerPrefs.SetInt("DebugMode", value);
+        debugConsoleEnabled = value;
+        PlayerPrefs.Save();
     }
 }

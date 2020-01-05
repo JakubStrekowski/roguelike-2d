@@ -25,7 +25,7 @@ public abstract class Character : MonoBehaviour, IPositionInitializer
     public AudioClip gotHitSound;
 
     public Map currentMap;
-    protected TurnManager turnManager;
+    public TurnManager turnManager;
 
     public Item[] equipment;
     // Start is called before the first frame update

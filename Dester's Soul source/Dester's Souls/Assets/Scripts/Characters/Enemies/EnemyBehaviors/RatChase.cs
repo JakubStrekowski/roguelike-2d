@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using UnityEngine;
 using static EnemyPathFindingAStar;
 
@@ -28,11 +29,13 @@ public class RatChase : RatMoveState
             LevelGenerator.Point endPoint = new LevelGenerator.Point();
             endPoint.X = context.LastHeroPosX - context.posX + 5;
             endPoint.Y = context.LastHeroPosY - context.posY + 5;
+            Stopwatch sw = Stopwatch.StartNew();
             List<Node> path = context.currentMap.enemyPathFindingA.FindPath(startPoint, endPoint, context.currentMap.GenerateTruePathCosts(context.posX - 5, context.posY - 5, context.posX + 5, context.posY + 5, context), 5, 5);
             if (path is null)
             {
                 return;
             }
+            context.GetComponent<Enemy>().turnManager.AddLog("Enemy found path in: " + sw.ElapsedMilliseconds + "ms");
             int subtractAmmount;
             if (path.Count > 1) subtractAmmount = 2;
             else subtractAmmount = 1;
