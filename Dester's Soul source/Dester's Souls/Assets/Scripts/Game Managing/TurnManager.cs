@@ -291,9 +291,9 @@ public class TurnManager : MonoBehaviour
         }
     }
 
-    public void AddLog(string message)
+    public void AddLog(string message,string fileMessage="")
     {
         if (GameManager._instance.GetComponent<GameDataManager>().DebugConsoleEnabled == 1)
-            debugLogManager.AddLog(message);
+            debugLogManager.AddLog(message,fileMessage);
     }
 }

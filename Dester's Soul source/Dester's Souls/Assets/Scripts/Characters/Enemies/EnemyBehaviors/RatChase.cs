@@ -31,11 +31,18 @@ public class RatChase : RatMoveState
             endPoint.Y = context.LastHeroPosY - context.posY + 5;
             Stopwatch sw = Stopwatch.StartNew();
             List<Node> path = context.currentMap.enemyPathFindingA.FindPath(startPoint, endPoint, context.currentMap.GenerateTruePathCosts(context.posX - 5, context.posY - 5, context.posX + 5, context.posY + 5, context), 5, 5);
+            context.GetComponent<Enemy>().turnManager.AddLog("Enemy " + context.gameObject.GetInstanceID().ToString() + " found path in: " + sw.Elapsed.Ticks + " ticks", sw.Elapsed.Ticks.ToString()+" "); //10000 ticks is 1 ms
             if (path is null)
             {
                 return;
             }
-            context.GetComponent<Enemy>().turnManager.AddLog("Enemy found path in: " + sw.ElapsedMilliseconds + "ms");
+            sw = Stopwatch.StartNew();
+            if (GameManager._instance.GetComponent<GameDataManager>().UsingBreadthAlgorithm == 1)
+            {
+                context.currentMap.enemyPathFindingA.FindPathBreadth(startPoint, endPoint, context.currentMap.GenerateTruePathCosts(context.posX - 5, context.posY - 5, context.posX + 5, context.posY + 5, context), 5, 5);
+            }
+            context.GetComponent<Enemy>().turnManager.AddLog("Enemy " + context.gameObject.GetInstanceID().ToString() + " found path with BFS in: " + sw.Elapsed.Ticks + " ticks", sw.Elapsed.Ticks.ToString()+"\n");
+            sw.Stop();
             int subtractAmmount;
             if (path.Count > 1) subtractAmmount = 2;
             else subtractAmmount = 1;

@@ -26,8 +26,8 @@ public class EnemyPathFindingAStar
 
         public int FunctionF(Point targetPos)
         {
-            Point distancePoint = LevelGenerator.MeasureDistance(position, targetPos);
-            return distancePoint.X + distancePoint.Y;
+            
+            return Mathf.Abs(position.X - targetPos.X) + Mathf.Abs(position.Y - targetPos.Y);
         }
 
         public Node[] GenerateSuccessors(int[][] costTable)
@@ -145,27 +145,59 @@ public class EnemyPathFindingAStar
                 }
             }
         }
-        int[][] debugMap = new int[costs.Length][];
-        for (int i = 0; i < debugMap.Length; i++)
+
+        Debug.Log("Couldn't connect: " + sourcePoint.Y + " " + sourcePoint.X + " to: " + targetPoint.Y + " " + targetPoint.X);
+        return null;
+    }
+
+    public List<Node> FindPathBreadth(Point sourcePoint, Point targetPoint, int[][] costs, int offsetX, int offsetY)
+    {
+        ResetCostValues();
+
+        openNodes.Add(new Node(sourcePoint));
+        openNodes[0].totalCost = 0;
+        while (openNodes.Count != 0)
         {
-            debugMap[i] = new int[costs[0].Length];
-            for (int j = 0; j < debugMap[0].Length; j++)
+            Node currentNode = null;
+            int minimalCost = int.MaxValue;
+            foreach (Node node in openNodes)
             {
-                debugMap[i][j] = 0;
+                if (minimalCost >= node.totalCost)
+                {
+                    minimalCost = node.totalCost;
+                    currentNode = node;
+                }
             }
-        }
-        foreach (Node node in closedNodes)
-        {
-            debugMap[node.position.Y][node.position.X] = 1;
-        }
-        for (int i = 0; i < debugMap.Length; i++)
-        {
-            string s = "";
-            for (int j = 0; j < debugMap[0].Length; j++)
+            openNodes.Remove(currentNode);
+            closedNodes.Add(currentNode);
+            if (currentNode.position.Y == targetPoint.Y && currentNode.position.X == targetPoint.X)
             {
-                s += debugMap[i][j].ToString() + " ";
+                return RecreatePath(currentNode);
             }
-            //Debug.Log(s);
+            //generating succesor nodes
+            Node[] successors = currentNode.GenerateSuccessors(costs);
+            if (successors is null) continue;
+            foreach (Node successorNode in successors)
+            {
+                if (successorNode.position.X == 0 || successorNode.position.Y == 0
+                    || successorNode.position.X == sizeX || successorNode.position.Y == sizeY) continue;
+
+                if (closedNodes.Exists(x => (x.position.X == successorNode.position.X) && (x.position.Y == successorNode.position.Y))) continue;
+
+                else
+                {
+                    int possibleNewRouteVal = currentNode.totalCost + 1; //not using costs so just adding 1
+                    if (possibleNewRouteVal < successorNode.totalCost)
+                    {
+                        successorNode.previousNode = currentNode;
+                        successorNode.totalCost = possibleNewRouteVal;
+                        if (!(openNodes.Exists(x => (x.position.X == successorNode.position.X) && (x.position.Y == successorNode.position.Y))))
+                        {
+                            openNodes.Add(successorNode);
+                        }
+                    }
+                }
+            }
         }
 
         Debug.Log("Couldn't connect: " + sourcePoint.Y + " " + sourcePoint.X + " to: " + targetPoint.Y + " " + targetPoint.X);

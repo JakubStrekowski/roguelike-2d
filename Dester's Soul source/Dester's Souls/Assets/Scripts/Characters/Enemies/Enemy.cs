@@ -164,10 +164,7 @@ public abstract class Enemy : Character, IPlayerStandardInteraction, IVisibility
 
     public override void OnDeath()
     {
-        Debug.Log(name + " is dead!");
-        Debug.Log("list size1: " + turnManager.enemyList.Count.ToString());
         turnManager.RemoveEnemyFromList(this);
-        Debug.Log("list size2: " + turnManager.enemyList.Count.ToString());
         Destroy(gameObject);
     }
 

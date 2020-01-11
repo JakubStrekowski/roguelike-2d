@@ -14,14 +14,50 @@ public class GameDataManager : MonoBehaviour
         musicVolume = PlayerPrefs.GetFloat("MusicVolume", 0.5f);
         soundVolume = PlayerPrefs.GetFloat("SoundVolume", 0.5f);
         debugConsoleEnabled = PlayerPrefs.GetInt("DebugMode", 0);
+        saveDebugInFile = PlayerPrefs.GetInt("DebugSave", 0);
+        usingBreadthAlgorithm = PlayerPrefs.GetInt("BreadthAlgorithm", 0);
+        if(debugConsoleEnabled == 0)
+        {
+            SaveDebugInFile = 0;
+            UsingBreadthAlgorithm = 0;
+        }
     }
 
-
+    private int usingBreadthAlgorithm;
+    private int saveDebugInFile;
     private int debugConsoleEnabled;
     private float soundVolume;
     private float musicVolume;
 
-    public int DebugConsoleEnabled { get => debugConsoleEnabled; set => debugConsoleEnabled = value; }
+
+    public int UsingBreadthAlgorithm {
+        get => usingBreadthAlgorithm;
+        set
+        {
+            PlayerPrefs.SetInt("BreadthAlgorithm", value);
+            usingBreadthAlgorithm = value;
+            PlayerPrefs.Save();
+        }
+    }
+    public int SaveDebugInFile {
+        get => saveDebugInFile;
+        set
+        {
+            PlayerPrefs.SetInt("DebugSave", value);
+            saveDebugInFile = value;
+            PlayerPrefs.Save();
+        }
+    }
+    public int DebugConsoleEnabled
+    {
+        get => debugConsoleEnabled;
+        set
+        {
+            PlayerPrefs.SetInt("DebugMode", value);
+            debugConsoleEnabled = value;
+            PlayerPrefs.Save();
+        }
+    }
     public float MusicVolume { get => musicVolume; }
     public float SoundsVolume { get => soundVolume; }
 
@@ -41,10 +77,4 @@ public class GameDataManager : MonoBehaviour
 
     }
 
-    public void SetDebugMode(int value)
-    {
-        PlayerPrefs.SetInt("DebugMode", value);
-        debugConsoleEnabled = value;
-        PlayerPrefs.Save();
-    }
 }

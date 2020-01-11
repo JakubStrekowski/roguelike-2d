@@ -348,16 +348,6 @@ public class Map
                 }
             }
         }
-        Debug.Log("Weights for: " + beginX + 5 + " " + beginY + 5);
-        foreach(int[] row in costs)
-        {
-            string s="";
-            foreach(int weight in row)
-            {
-                s += weight.ToString() + " ";
-            }
-            Debug.Log(s);
-        }
 
         return costs;
     }
