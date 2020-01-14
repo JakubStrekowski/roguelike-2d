@@ -26,20 +26,48 @@ public class SkeletonChasing : SkeletonMoveState
             LevelGenerator.Point endPoint = new LevelGenerator.Point();
             endPoint.X = context.LastHeroPosX - context.posX + 5;
             endPoint.Y = context.LastHeroPosY - context.posY + 5;
-            Stopwatch sw = Stopwatch.StartNew();
-            List<Node>path = context.currentMap.enemyPathFindingA.FindPath(startPoint, endPoint, context.currentMap.GenerateTruePathCosts(context.posX - 5, context.posY - 5, context.posX + 5, context.posY + 5, context), 5, 5);
-            context.GetComponent<Enemy>().turnManager.AddLog("Enemy " + context.gameObject.GetInstanceID().ToString() + " found path in: " + sw.Elapsed.Ticks + " ticks", sw.Elapsed.Ticks.ToString()+" "); //10000 ticks is 1 ms
-            if (path is null)
-            {
-                return;
-            }
-            sw = Stopwatch.StartNew();
+            List<Node> path = null;
+            Stopwatch sw;
+
+
             if (GameManager._instance.GetComponent<GameDataManager>().UsingBreadthAlgorithm == 1)
             {
-                context.currentMap.enemyPathFindingA.FindPathBreadth(startPoint, endPoint, context.currentMap.GenerateTruePathCosts(context.posX - 5, context.posY - 5, context.posX + 5, context.posY + 5, context), 5, 5);
+                sw = Stopwatch.StartNew();
+                if (GameManager._instance.GetComponent<GameDataManager>().UsingBreadthAlgorithm == 1)
+                {
+                    for (int i = 0; i < 100; i++)
+                    {
+                        context.currentMap.enemyPathFindingA.FindPathBreadth(startPoint, endPoint, context.currentMap.GenerateTruePathCosts(context.posX - 5, context.posY - 5, context.posX + 5, context.posY + 5, context), 5, 5);
+                    }
+                }
+                sw.Stop();
+                context.GetComponent<Enemy>().turnManager.AddLog("Enemy " + context.gameObject.GetInstanceID().ToString() + " found path with BFS in: " + sw.Elapsed.Ticks + " ticks", sw.Elapsed.Ticks.ToString() + " ");
+
+                sw = Stopwatch.StartNew();
+                for (int i = 0; i < 100; i++)
+                {
+                    path = context.currentMap.enemyPathFindingA.FindPath(startPoint, endPoint, context.currentMap.GenerateTruePathCosts(context.posX - 5, context.posY - 5, context.posX + 5, context.posY + 5, context), 5, 5);
+                }
+                sw.Stop();
+                context.GetComponent<Enemy>().turnManager.AddLog("Enemy " + context.gameObject.GetInstanceID().ToString() + " found path in: " + sw.Elapsed.Ticks + " ticks", sw.Elapsed.Ticks.ToString() + "\n"); //10000 ticks is 1 ms
+                if (path is null)
+                {
+                    return;
+                }
             }
-            context.GetComponent<Enemy>().turnManager.AddLog("Enemy " + context.gameObject.GetInstanceID().ToString() + " found path with BFS in: " + sw.Elapsed.Ticks + " ticks", sw.Elapsed.Ticks.ToString()+"\n");
-            sw.Stop();
+            else
+            {
+                for (int i = 0; i < 1; i++)
+                {
+                    path = context.currentMap.enemyPathFindingA.FindPath(startPoint, endPoint, context.currentMap.GenerateTruePathCosts(context.posX - 5, context.posY - 5, context.posX + 5, context.posY + 5, context), 5, 5);
+                }
+                if (path is null)
+                {
+                    return;
+                }
+
+            }
+
             int subtractAmmount;
             if (path.Count > 1) subtractAmmount = 2;
             else subtractAmmount = 1;

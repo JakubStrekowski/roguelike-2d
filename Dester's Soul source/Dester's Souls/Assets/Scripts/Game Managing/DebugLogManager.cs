@@ -32,7 +32,7 @@ public class DebugLogManager : MonoBehaviour
             }
             debugFile = ("Logs/GameLog_" + System.DateTime.Now.ToString("MM/dd/yyyy HH_mm") + ".txt");
             streamWriter =  File.AppendText(debugFile);
-            streamWriter.WriteLine("AStar BFS");
+            streamWriter.WriteLine("BFS AStar");
         }
     }
 

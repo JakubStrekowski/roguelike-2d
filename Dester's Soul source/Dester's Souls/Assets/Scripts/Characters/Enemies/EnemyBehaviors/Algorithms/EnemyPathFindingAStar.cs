@@ -39,32 +39,44 @@ public class EnemyPathFindingAStar
                 Point newPos = new Point();
                 newPos.X = position.X - 1;
                 newPos.Y = position.Y;
-                potentialNodes[successess] = new Node(newPos);
-                successess++;
+                if (costTable[newPos.Y][newPos.X] < 1000)
+                {
+                    potentialNodes[successess] = new Node(newPos);
+                    successess++;
+                }
             }
             if (position.X + 1 < costTable[0].Length)
             {
                 Point newPos = new Point();
                 newPos.X = position.X + 1;
                 newPos.Y = position.Y;
-                potentialNodes[successess] = new Node(newPos);
-                successess++;
+                if (costTable[newPos.Y][newPos.X] < 1000)
+                {
+                    potentialNodes[successess] = new Node(newPos);
+                    successess++;
+                }
             }
             if (position.Y - 1 > 0)
             {
                 Point newPos = new Point();
                 newPos.X = position.X;
                 newPos.Y = position.Y - 1;
-                potentialNodes[successess] = new Node(newPos);
-                successess++;
+                if (costTable[newPos.Y][newPos.X] < 1000)
+                {
+                    potentialNodes[successess] = new Node(newPos);
+                    successess++;
+                }
             }
             if (position.Y + 1 < costTable.Length)
             {
                 Point newPos = new Point();
                 newPos.X = position.X;
                 newPos.Y = position.Y + 1;
-                potentialNodes[successess] = new Node(newPos);
-                successess++;
+                if (costTable[newPos.Y][newPos.X] < 1000)
+                {
+                    potentialNodes[successess] = new Node(newPos);
+                    successess++;
+                }
             }
             if (successess == 0) return null;
             Node[] successors = new Node[successess];
