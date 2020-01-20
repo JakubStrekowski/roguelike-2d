@@ -30,18 +30,18 @@ public class SkeletonChasing : SkeletonMoveState
             Stopwatch sw;
 
 
-            if (GameManager._instance.GetComponent<GameDataManager>().UsingBreadthAlgorithm == 1)
+            if (GameManager._instance.GetComponent<GameDataManager>().DebugConsoleEnabled == 1)
             {
-                sw = Stopwatch.StartNew();
                 if (GameManager._instance.GetComponent<GameDataManager>().UsingBreadthAlgorithm == 1)
                 {
+                    sw = Stopwatch.StartNew();
                     for (int i = 0; i < 100; i++)
                     {
                         context.currentMap.enemyPathFindingA.FindPathBreadth(startPoint, endPoint, context.currentMap.GenerateTruePathCosts(context.posX - 5, context.posY - 5, context.posX + 5, context.posY + 5, context), 5, 5);
                     }
+                    sw.Stop();
+                    context.GetComponent<Enemy>().turnManager.AddLog("Enemy " + context.gameObject.GetInstanceID().ToString() + " found path with BFS in: " + sw.Elapsed.Ticks + " ticks", sw.Elapsed.Ticks.ToString() + " ");
                 }
-                sw.Stop();
-                context.GetComponent<Enemy>().turnManager.AddLog("Enemy " + context.gameObject.GetInstanceID().ToString() + " found path with BFS in: " + sw.Elapsed.Ticks + " ticks", sw.Elapsed.Ticks.ToString() + " ");
 
                 sw = Stopwatch.StartNew();
                 for (int i = 0; i < 100; i++)

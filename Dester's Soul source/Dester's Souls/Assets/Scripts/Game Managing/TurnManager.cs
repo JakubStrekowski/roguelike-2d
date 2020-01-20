@@ -28,6 +28,8 @@ public class TurnManager : MonoBehaviour
     public TextMeshProUGUI enemyKilledAmnt;
     public ScreenEffects screenEffects;
     public GameObject debugLogPanel;
+    public TextMeshProUGUI yourScore;
+    public TextMeshProUGUI highScore;
 
     private Map currentMap;
     private bool isHeroAlife;
@@ -263,6 +265,13 @@ public class TurnManager : MonoBehaviour
         {
             deathPanel.SetActive(true);
             currentController = Controllers.subMenu;
+            int score = (GameManager._instance.EnemiesKilled + GameManager._instance.CollectedGold * 10);
+            yourScore.SetText("Your Score: " + score.ToString());
+            if (score > GameManager._instance.GetComponent<GameDataManager>().BestScore)
+            {
+                GameManager._instance.GetComponent<GameDataManager>().BestScore = score;
+            }
+            highScore.SetText("Best Score: " + GameManager._instance.GetComponent<GameDataManager>().BestScore.ToString());
         }
     }
 

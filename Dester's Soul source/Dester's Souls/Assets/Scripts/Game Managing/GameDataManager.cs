@@ -16,6 +16,7 @@ public class GameDataManager : MonoBehaviour
         debugConsoleEnabled = PlayerPrefs.GetInt("DebugMode", 0);
         saveDebugInFile = PlayerPrefs.GetInt("DebugSave", 0);
         usingBreadthAlgorithm = PlayerPrefs.GetInt("BreadthAlgorithm", 0);
+        bestScore = PlayerPrefs.GetInt("BestScore", 0);
         if(debugConsoleEnabled == 0)
         {
             SaveDebugInFile = 0;
@@ -26,6 +27,7 @@ public class GameDataManager : MonoBehaviour
     private int usingBreadthAlgorithm;
     private int saveDebugInFile;
     private int debugConsoleEnabled;
+    private int bestScore;
     private float soundVolume;
     private float musicVolume;
 
@@ -58,9 +60,20 @@ public class GameDataManager : MonoBehaviour
             PlayerPrefs.Save();
         }
     }
+    public int BestScore
+    {
+        get => bestScore;
+        set
+        {
+            PlayerPrefs.SetInt("BestScore", value);
+            bestScore = value;
+            PlayerPrefs.Save();
+        }
+    }
+
     public float MusicVolume { get => musicVolume; }
     public float SoundsVolume { get => soundVolume; }
-
+    
 
     public void SetMusicLevel(float value)
     {
@@ -76,5 +89,6 @@ public class GameDataManager : MonoBehaviour
         PlayerPrefs.Save();
 
     }
+
 
 }

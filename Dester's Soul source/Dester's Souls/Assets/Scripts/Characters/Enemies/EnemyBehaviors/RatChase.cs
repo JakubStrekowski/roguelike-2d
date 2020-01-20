@@ -34,20 +34,21 @@ public class RatChase : RatMoveState
 
             if (GameManager._instance.GetComponent<GameDataManager>().DebugConsoleEnabled == 1)
             {
-                
-                sw = Stopwatch.StartNew();
                 if (GameManager._instance.GetComponent<GameDataManager>().UsingBreadthAlgorithm == 1)
                 {
+                    sw = Stopwatch.StartNew();
+
                     for (int i = 0; i < 100; i++)
                     {
-                        if(context.currentMap.enemyPathFindingA.FindPathBreadth(startPoint, endPoint, context.currentMap.GenerateTruePathCosts(context.posX - 5, context.posY - 5, context.posX + 5, context.posY + 5, context), 5, 5) is null)
+                        if (context.currentMap.enemyPathFindingA.FindPathBreadth(startPoint, endPoint, context.currentMap.GenerateTruePathCosts(context.posX - 5, context.posY - 5, context.posX + 5, context.posY + 5, context), 5, 5) is null)
                         {
                             return;
                         }
                     }
+
+                    sw.Stop();
+                    context.GetComponent<Enemy>().turnManager.AddLog("Enemy " + context.gameObject.GetInstanceID().ToString() + " found path with BFS in: " + sw.Elapsed.Ticks + " ticks", sw.Elapsed.Ticks.ToString() + " ");
                 }
-                sw.Stop();
-                context.GetComponent<Enemy>().turnManager.AddLog("Enemy " + context.gameObject.GetInstanceID().ToString() + " found path with BFS in: " + sw.Elapsed.Ticks + " ticks", sw.Elapsed.Ticks.ToString() + " ");
 
                 sw = Stopwatch.StartNew();
                 for (int i = 0; i < 100; i++)

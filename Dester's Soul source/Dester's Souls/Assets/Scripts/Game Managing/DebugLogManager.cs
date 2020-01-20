@@ -32,7 +32,14 @@ public class DebugLogManager : MonoBehaviour
             }
             debugFile = ("Logs/GameLog_" + System.DateTime.Now.ToString("MM/dd/yyyy HH_mm") + ".txt");
             streamWriter =  File.AppendText(debugFile);
-            streamWriter.WriteLine("BFS AStar");
+            if(GameManager._instance.GetComponent<GameDataManager>().UsingBreadthAlgorithm == 1)
+            {
+                streamWriter.WriteLine("BFS AStar");
+            }
+            else
+            {
+                streamWriter.WriteLine("AStar");
+            }
         }
     }
 
@@ -67,15 +74,20 @@ public class DebugLogManager : MonoBehaviour
 
     public void RefreshLog()
     {
-        debugText.text = "";
-        foreach(string str in currentLog)
+        if (GameManager._instance.GetComponent<GameDataManager>().DebugConsoleEnabled == 1)
         {
-            debugText.SetText(debugText.text + str + System.Environment.NewLine);
+            debugText.text = "";
+            foreach (string str in currentLog)
+            {
+                debugText.SetText(debugText.text + str + System.Environment.NewLine);
+            }
+
         }
     }
 
     private void OnApplicationQuit()
     {
+        if(!(streamWriter is null))
         streamWriter.Close();
     }
 
