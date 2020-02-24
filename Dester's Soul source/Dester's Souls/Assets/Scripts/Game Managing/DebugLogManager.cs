@@ -43,6 +43,8 @@ public class DebugLogManager : MonoBehaviour
         }
     }
 
+  
+
 
 
     public void AddLog(string message, string fileMessage="")
@@ -83,6 +85,12 @@ public class DebugLogManager : MonoBehaviour
             }
 
         }
+    }
+
+    public void SaveLog()
+    {
+        if (!(streamWriter is null))
+            streamWriter.Close();
     }
 
     private void OnApplicationQuit()

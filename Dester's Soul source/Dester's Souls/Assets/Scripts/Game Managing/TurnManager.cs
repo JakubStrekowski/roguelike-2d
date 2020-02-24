@@ -305,4 +305,9 @@ public class TurnManager : MonoBehaviour
         if (GameManager._instance.GetComponent<GameDataManager>().DebugConsoleEnabled == 1)
             debugLogManager.AddLog(message,fileMessage);
     }
+
+    private void OnDestroy()
+    {
+        debugLogManager.SaveLog();
+    }
 }

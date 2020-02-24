@@ -232,8 +232,7 @@ public class LevelGenerator
     {
         int sourceX = beginX;
         int sourceY = beginY;
-        bool possible = true;
-        switch (direction)
+        switch (direction) //setting room begin points depending on set direction 0-up, 1-down, 2-right, 3-left
         {
             case 0:
                 beginY -= (sizeY - 1);
@@ -254,7 +253,7 @@ public class LevelGenerator
             default:
                 break;
         }
-        if (!(beginX >= 0) || !(beginY >= 0) || sizeX + beginX > mapSizeX || sizeY + beginY > mapSizeY)
+        if (!(beginX >= 0) || !(beginY >= 0) || sizeX + beginX > mapSizeX || sizeY + beginY > mapSizeY) //if room passes borders of map, return failure
         {
             return false;
         }
@@ -262,14 +261,13 @@ public class LevelGenerator
         {
             for (int j = beginX; j < sizeX + beginX; j++)
             {
-                if (dungeonStructure.dungeon[i][j] != 10)
+                if (dungeonStructure.dungeon[i][j] != 10) //room already exists here, return failure
                 {
                     return false;
                 }
             }
         }
-        if (!possible) return false;
-        Room room = new Room(beginX, sizeX, beginY, sizeY);
+        Room room = new Room(beginX, sizeX, beginY, sizeY);  //saving room parameters, setting room walls and floors variant
         if (!corridor) rooms.Add(room);
         for (int i = beginY; i < sizeY + beginY; i++)
         {
@@ -277,15 +275,14 @@ public class LevelGenerator
             {
                 if (!corridor && (i == beginY || j == beginX || i == beginY + sizeY - 1 || j == beginX + sizeX - 1))
                 {
-                    dungeonStructure.dungeon[i][j] = room.wallVariant;
+                    dungeonStructure.dungeon[i][j] = room.wallVariant; //painting wall
                 }
                 else
                 {
-                    dungeonStructure.dungeon[i][j] = room.floorVariant;
+                    dungeonStructure.dungeon[i][j] = room.floorVariant; //painting floor
                 }
             }
         }
-        
         return true;
     }
 
