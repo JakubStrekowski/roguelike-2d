@@ -15,7 +15,6 @@ public class TileFactory : MonoBehaviour
         if (level == 1)
         {
             turnManager = GameObject.Find("DungeonManager").GetComponent<TurnManager>();
-            Debug.Log(turnManager.ToString());
         }
     }
 

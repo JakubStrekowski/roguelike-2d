@@ -63,6 +63,11 @@ public class GameInput:MonoBehaviour
             KeyUsed();
             return "Space";
         }
+        if (Input.GetKey(KeyCode.Escape))
+        {
+            KeyUsed();
+            return "Escape";
+        }
         if (Input.GetKey(KeyCode.Alpha1)|| Input.GetKeyDown(KeyCode.Keypad1))
         {
             KeyUsed();

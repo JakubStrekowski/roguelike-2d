@@ -56,7 +56,8 @@ public class DebugLogManager : MonoBehaviour
         }
         string newMessage = (currentPosition + 1).ToString() + ". " + message;
         currentLog[currentPosition] = newMessage;
-        string fullMessage = debugText.text + currentLog[currentPosition] + System.Environment.NewLine;
+        string fullMessage = debugText.text + currentLog[currentPosition] + '\n';
+        /*
         if(currentPosition<5)
         {
             debugScroll.value = 1;
@@ -64,7 +65,7 @@ public class DebugLogManager : MonoBehaviour
         else
         {
             debugScroll.value = (float)1 - ((currentPosition) / 29f);
-        }
+        }*/
         currentPosition++;
         debugText.SetText(fullMessage);
         if(GameManager._instance.GetComponent<GameDataManager>().SaveDebugInFile == 1 && fileMessage != "")

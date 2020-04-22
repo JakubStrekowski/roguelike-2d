@@ -140,6 +140,9 @@ public class TurnManager : MonoBehaviour
                     }
                     
                 case "Escape":
+                    GameManager._instance.LoadScene(0);
+                    return false;
+
                 case "Q":
                     {
                         currentController = Controllers.mainMenu;
