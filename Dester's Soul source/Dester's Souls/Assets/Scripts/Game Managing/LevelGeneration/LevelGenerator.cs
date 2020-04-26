@@ -1,6 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using UnityEngine;
+using System.Diagnostics;
+
 using static AStarCorridors;
 
 public class DungeonStruct
@@ -29,6 +32,8 @@ public class DungeonStruct
     }
 }
 
+
+
 public class LevelGenerator
 {
     private DungeonStruct dungeonStructure;
@@ -40,8 +45,8 @@ public class LevelGenerator
 
     public LevelGenerator(int sizeX, int sizeY)
     {
-        mapSizeX = sizeX;
-        mapSizeY = sizeY;
+        mapSizeX = sizeX * 12;
+        mapSizeY = sizeY * 12;
         connectedRooms = new List<Room>();
         rooms = new List<Room>();
         rnd = new System.Random();
@@ -50,13 +55,28 @@ public class LevelGenerator
 
     public DungeonStruct CreateDungeon(int sizeX, int sizeY, int roomsAmnt)
     {
-        mapSizeX = sizeX;
-        mapSizeY = sizeY;
+        UnityEngine.Debug.Log("Creting empty sturcture:");
+        Stopwatch stopWatch = new Stopwatch();
+        stopWatch.Start();
+        mapSizeX = sizeX * 12;
+        mapSizeY = sizeY * 12;
         rooms = new List<Room>();
         rnd = new System.Random();
-        dungeonStructure = new DungeonStruct(sizeX, sizeY);
+        dungeonStructure = new DungeonStruct(mapSizeX, mapSizeY);
 
-        CreateIfPossible(rnd.Next(4, 8), rnd.Next(4, 8), 0, rnd.Next(10, sizeX-10), rnd.Next(10, sizeY-10), false);
+        DungeonGrid dungeonGrid = new DungeonGrid(dungeonStructure.dungeon);
+
+        int roomSizeX = rnd.Next(4, 8);
+        int roomSizeY = rnd.Next(4, 8);
+        int direction = 0;
+
+        UnityEngine.Debug.Log("Creting empty sturcture finished in" + stopWatch.ElapsedMilliseconds);
+        stopWatch.Reset();
+        stopWatch.Start();
+        UnityEngine.Debug.Log("Creating rooms");
+
+        Point roomBeginCoordinates = dungeonGrid.GetRoomCreationPoint(direction, roomSizeX, roomSizeY);
+        CreateIfPossible(roomSizeX, roomSizeY, direction, roomBeginCoordinates.X, roomBeginCoordinates.Y, false);
         rooms[0].isConnected = true;
         connectedRooms.Add(rooms[0]);
         int selectedRoom;
@@ -65,53 +85,19 @@ public class LevelGenerator
 
             selectedRoom = rnd.Next(rooms.Count);
 
-            int dir = rnd.Next(4);
+            direction = rnd.Next(4);
 
-            Point nextPlace;
-            nextPlace.X = rnd.Next(0, mapSizeX);
-            nextPlace.Y = rnd.Next(0, mapSizeY);
-            CreateIfPossible(rnd.Next(6, 12), rnd.Next(6, 12), dir, nextPlace.X, nextPlace.Y, false);
-
+            Point nextPlace = dungeonGrid.GetRoomCreationPoint(direction, roomSizeX, roomSizeY);
+            CreateIfPossible(rnd.Next(6, 12), rnd.Next(6, 12), direction, nextPlace.X, nextPlace.Y, false);
         }
         int id = 0;
-        //every room connects to another room, which wasnt connected to any before
-        /*
-        foreach (Room room in rooms)
-        {
-            if (!room.isConnected)
-            {
-                int rand = rnd.Next(connectedRooms.Count);
-                Room rndroom = rooms[rand];
-                while (rndroom == room)
-                {
-                    rand = rnd.Next(rooms.Count);
-                    rndroom = rooms[rand];
-                }
-                connectedRooms.Add(room);
-                ConnectTwoRooms(room, rndroom);
-                room.AddConnection(rand);
-                rndroom.AddConnection(id);
-                room.isConnected = true;
-                rndroom.isConnected = true;
-            }
-            id++;
-        }
 
-        //adding random room connections
-        int randomConnections = rnd.Next(2, 8);
-        for (int i = 0; i < randomConnections; i++)
-        {
-            int room1 = rnd.Next(connectedRooms.Count);
-            int room2 = rnd.Next(connectedRooms.Count);
-            if (room1 == room2)
-            {
-                room2 = rnd.Next(connectedRooms.Count);
-            }
-            ConnectTwoRooms(connectedRooms[room1], connectedRooms[room2]);
-        }
-        */
-        
-        AStarCorridors aStarCorridors = new AStarCorridors(sizeX, sizeY, dungeonStructure.dungeon, rooms);
+        UnityEngine.Debug.Log("Rooms created in " + stopWatch.ElapsedTicks);
+        stopWatch.Reset();
+        stopWatch.Start();
+        UnityEngine.Debug.Log("Connecting rooms");
+
+        AStarCorridors aStarCorridors = new AStarCorridors(mapSizeX, mapSizeY, dungeonStructure.dungeon, rooms);
         foreach (Room room in rooms)
         {
             if (!room.isConnected)
@@ -138,7 +124,7 @@ public class LevelGenerator
                 }
                 else
                 {
-                    Debug.Log("Path was null");
+                    UnityEngine.Debug.Log("Path was null");
                 }
             }
             id++;
@@ -167,9 +153,14 @@ public class LevelGenerator
                 }
                 else
                 {
-                    Debug.Log("Path was null");
+                     UnityEngine.Debug.Log("Path was null");
                 }
         }
+
+        UnityEngine.Debug.Log("Rooms connected in " + stopWatch.ElapsedTicks);
+        stopWatch.Reset();
+        stopWatch.Start();
+        UnityEngine.Debug.Log("Placing objects");
 
         //placing enemies and items
         for (int i = 1; i < rooms.Count; i++)
@@ -199,6 +190,10 @@ public class LevelGenerator
         dungeonStructure.dungeon[randInLast.Y][randInLast.X] = 20;
         PutHero();
 
+        UnityEngine.Debug.Log("Obcjects placed in " + stopWatch.ElapsedTicks);
+        stopWatch.Stop();
+
+        /*
         foreach (int[] itgr in dungeonStructure.characterMap)
         {
             string s = "";
@@ -208,6 +203,7 @@ public class LevelGenerator
             }
             //Debug.Log(s);
         }
+        */
         return dungeonStructure;
 
     }
@@ -230,8 +226,7 @@ public class LevelGenerator
 
     private bool CreateIfPossible(int sizeX, int sizeY, int direction, int beginX, int beginY, bool corridor)
     {
-        int sourceX = beginX;
-        int sourceY = beginY;
+        /*
         switch (direction) //setting room begin points depending on set direction 0-up, 1-down, 2-right, 3-left
         {
             case 0:
@@ -253,6 +248,7 @@ public class LevelGenerator
             default:
                 break;
         }
+        */
         if (!(beginX >= 0) || !(beginY >= 0) || sizeX + beginX > mapSizeX || sizeY + beginY > mapSizeY) //if room passes borders of map, return failure
         {
             return false;
@@ -527,5 +523,86 @@ public class LevelGenerator
     {
         public int X;
         public int Y;
+    }
+
+    public class DungeonGridElement
+    {
+        public int startX;
+        public int startY;
+        public bool hasRoom;
+
+        public DungeonGridElement(int y, int x)
+        {
+            startY = y;
+            startX = x;
+            hasRoom = false;
+        }
+    }
+
+    public class DungeonGrid
+    {
+        public DungeonGridElement[][] grid;
+        private Collection<DungeonGridElement> emptyGridElements;
+
+        public DungeonGrid(int[][] dungeon)
+        {
+            //TODO add ceiling to division by 12
+            emptyGridElements = new Collection<DungeonGridElement>();
+            grid = new DungeonGridElement[dungeon.Length / 12][];
+            for (int i = 0; i < grid.Length; i++)
+            {
+                grid[i] = new DungeonGridElement[dungeon[0].Length / 12];
+                for (int j = 0; j < grid[0].Length; j++)
+                {
+                    grid[i][j] = new DungeonGridElement(i * 12, j * 12);
+                    if (i == grid.Length || j == grid[0].Length)
+                    {
+                        if (!(dungeon.Length - grid[i][j].startY < 8 || dungeon[0].Length - grid[i][j].startX < 8))
+                        {
+                            emptyGridElements.Add(grid[i][j]);
+                        }
+                    }
+                    else
+                    {
+                        emptyGridElements.Add(grid[i][j]);
+                    }
+                }
+            }
+        }
+
+        public Point GetRoomCreationPoint(int direction, int sizeX, int sizeY)
+        {
+            int selectedGridElem = Random.Range(0, emptyGridElements.Count);
+            Point selectedPoint = new Point();
+            selectedPoint.X = emptyGridElements[selectedGridElem].startX;
+            selectedPoint.Y = emptyGridElements[selectedGridElem].startY;
+
+            //selecting minimal down-left corner depending on direction
+            switch (direction)
+            {
+                case 0:
+                    selectedPoint.X += (sizeX / 2);
+                    break;
+                case 1:
+                    selectedPoint.Y += sizeY;
+                    selectedPoint.X += (sizeX / 2);
+                    break;
+                case 2:
+                    selectedPoint.Y += (sizeY/2);
+                    break;
+                case 3:
+                    selectedPoint.Y += (sizeY/2);
+                    selectedPoint.X += sizeX;
+                    break;
+            }
+
+            //adding random values to coordinates
+            selectedPoint.X += Random.Range(0, (6 - (sizeX)));
+            selectedPoint.Y += Random.Range(0, (6 - (sizeY)));
+
+            emptyGridElements.RemoveAt(selectedGridElem);
+
+            return selectedPoint;
+        }
     }
 }

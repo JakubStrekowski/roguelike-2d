@@ -80,18 +80,22 @@ public class AStarCorridors
     List<Node> openNodes;
     List<Node> closedNodes;
     int[][] costTable;
+    bool[][] alreadyAdded;
 
     public AStarCorridors(int sizeX, int sizeY, int[][] dungeon, List<Room> allRooms)
     {
         openNodes = new List<Node>();
         closedNodes = new List<Node>();
         costTable = new int[sizeY][];
+        alreadyAdded = new bool[sizeY][];
         for (int i = 0; i < sizeY; i++)
         {
             costTable[i] = new int[sizeX];
+            alreadyAdded[i] = new bool[sizeX];
             for (int j = 0; j < sizeX; j++)
             {
                 costTable[i][j] = 1;
+                alreadyAdded[i][j] = false;
             }
         }
         InitCostValuesNoCollisions(allRooms, dungeon);
@@ -101,6 +105,14 @@ public class AStarCorridors
     {
         openNodes.Clear();
         closedNodes.Clear();
+
+        for (int i = 0; i < alreadyAdded.Length; i++)
+        {
+            for (int j = 0; j < alreadyAdded[0].Length; j++)
+            {
+                alreadyAdded[i][j] = false;
+            }
+        }
     }
 
     public List<Node> ConnectTwoRoomsNoCollisions(int[][] dungeon,List<Room>allRooms, Room sourceRoom, Room targetRoom)
@@ -127,6 +139,7 @@ public class AStarCorridors
             }
             openNodes.Remove(currentNode);
             closedNodes.Add(currentNode);
+            alreadyAdded[currentNode.position.Y][currentNode.position.X] = true;
             if (currentNode.position.Y == targetPoint.Y && currentNode.position.X == targetPoint.X)
             {
                 ResetSourceTargetRoomCosts(sourceRoom, targetRoom);
@@ -140,7 +153,7 @@ public class AStarCorridors
                 if (successorNode.position.X == 0 || successorNode.position.Y == 0 
                     || successorNode.position.X == dungeon[0].Length-1 || successorNode.position.Y == dungeon.Length-1) continue;
 
-                if (closedNodes.Exists(x => (x.position.X == successorNode.position.X) && (x.position.Y == successorNode.position.Y))) continue;
+                if (alreadyAdded[successorNode.position.Y][successorNode.position.X]==true) continue;
 
                 else
                 {
@@ -151,9 +164,10 @@ public class AStarCorridors
                         successorNode.previousNode = currentNode;
                         successorNode.totalCost = possibleNewRouteVal;
                         successorNode.heuristicValue = successorNode.CalculateHeuristicVal(targetPoint, successorNode.totalCost);
-                        if (!(openNodes.Exists(x => (x.position.X == successorNode.position.X) && (x.position.Y == successorNode.position.Y))))
+                        if (!(alreadyAdded[successorNode.position.Y][successorNode.position.X] == true))
                         {
                             openNodes.Add(successorNode);
+                            alreadyAdded[successorNode.position.Y][successorNode.position.X] = true;
                         }
                     }
                 }

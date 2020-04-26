@@ -203,25 +203,25 @@ public class TurnManager : MonoBehaviour
         switch (floorNumber)
         {
             case 1:
-                rowAmmount = 35;
-                columnAmmount = 70;
-                return mapGenerator.CreateDungeon(columnAmmount, rowAmmount, 12);
+                rowAmmount = 3;
+                columnAmmount = 6;
+                return mapGenerator.CreateDungeon(columnAmmount, rowAmmount, 8);
             case 2:
-                rowAmmount = 50;
-                columnAmmount = 100;
-                return mapGenerator.CreateDungeon(columnAmmount, rowAmmount, 18);
+                rowAmmount = 5;
+                columnAmmount = 8;
+                return mapGenerator.CreateDungeon(columnAmmount, rowAmmount, 20);
             case 3:
-                rowAmmount = 70;
-                columnAmmount = 120;
-                return mapGenerator.CreateDungeon(columnAmmount, rowAmmount, 24);
+                rowAmmount = 8;
+                columnAmmount = 10;
+                return mapGenerator.CreateDungeon(columnAmmount, rowAmmount, 40);
             case 4:
-                rowAmmount = 80;
-                columnAmmount = 100;
-                return mapGenerator.CreateDungeon(columnAmmount, rowAmmount, 30);
+                rowAmmount = 20;
+                columnAmmount = 20;
+                return mapGenerator.CreateDungeon(columnAmmount, rowAmmount, 200);
         }
-        rowAmmount = 80;
-        columnAmmount = 100;
-        return mapGenerator.CreateDungeon(columnAmmount, rowAmmount, 20); ;
+        rowAmmount = 12;
+        columnAmmount = 14;
+        return mapGenerator.CreateDungeon(columnAmmount, rowAmmount, 60); ;
     }
 
     public void RemoveEnemyFromList(Enemy enemy)
