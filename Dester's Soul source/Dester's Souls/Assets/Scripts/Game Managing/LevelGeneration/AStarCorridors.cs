@@ -12,16 +12,26 @@ public class AStarCorridors
         public Point position;
         public int totalCost;
         public int heuristicValue;
+        public int previousMove; ///which move did generator made to go to this node: 0-none 1-vertical, 2-horizontal
+
+        public int lineDiscount; //additional discount to prevent constant switching between vertical and horizontal move
+        public int straightCounter; //counting how many times moved in straight line
         public Node(Point position)
         {
             previousNode = null;
             totalCost = int.MaxValue;
             heuristicValue = int.MaxValue;
             this.position = position;
+            previousMove = 0;
+            lineDiscount = 0;
+            straightCounter = 0;
         }
         public int CalculateHeuristicVal(Point targetPos,int myCost)
         {
-            heuristicValue= FunctionF(targetPos) + myCost;
+            if (previousMove == previousNode.previousMove)//applying discount only if going in straight line
+                heuristicValue = 2*FunctionF(targetPos)/ (10 - Mathf.Clamp(straightCounter * 2, 0, 9)) + myCost - lineDiscount;
+            else
+                heuristicValue = 2*FunctionF(targetPos)/(10 - Mathf.Clamp(straightCounter*2,0,9)) + myCost;
             return heuristicValue;
         }
 
@@ -162,8 +172,31 @@ public class AStarCorridors
                     if (possibleNewRouteVal < successorNode.totalCost)
                     {
                         successorNode.previousNode = currentNode;
+                        if (currentNode.position.X != successorNode.position.X) successorNode.previousMove = 2;
+                        else successorNode.previousMove = 1;
+                        if (costTable[successorNode.position.Y][successorNode.position.X] > 10) //if node is on a wall we count costs for creating curves
+                        {
+                            if (currentNode.lineDiscount > 0 && currentNode.previousMove == successorNode.previousMove)
+                            {
+                                successorNode.lineDiscount = currentNode.lineDiscount / 2;
+                                successorNode.straightCounter = currentNode.straightCounter + 1;
+                            }
+
+                            if (currentNode.previousMove != successorNode.previousMove)
+                            {
+                                successorNode.lineDiscount = 28;
+                                successorNode.straightCounter = 0;
+                            }
+                        }
+                        else
+                        {
+                            successorNode.lineDiscount = 28;
+                            successorNode.straightCounter = 0;
+                        }
                         successorNode.totalCost = possibleNewRouteVal;
                         successorNode.heuristicValue = successorNode.CalculateHeuristicVal(targetPoint, successorNode.totalCost);
+
+                        
                         if (!(alreadyAdded[successorNode.position.Y][successorNode.position.X] == true))
                         {
                             openNodes.Add(successorNode);
@@ -173,6 +206,7 @@ public class AStarCorridors
                 }
             }
         }
+        /*
         int[][] debugMap=new int[costTable.Length][];
         for(int i = 0; i < debugMap.Length; i++)
         {
@@ -182,6 +216,7 @@ public class AStarCorridors
                 debugMap[i][j] = 0;
             }
         }
+        
         foreach(Node node in closedNodes)
         {
             debugMap[node.position.Y][node.position.X] = 1;
@@ -195,7 +230,7 @@ public class AStarCorridors
             }
             //Debug.Log(s);
         }
-
+        */
         Debug.Log("Couldn't connect: "+sourcePoint.Y+" "+sourcePoint.X+" to: "+targetPoint.Y+" "+targetPoint.X);
         return null;
         }
@@ -228,7 +263,7 @@ public class AStarCorridors
                 }
                 else if (dungeon[i][j] <= 19)//we met wall
                 {
-                    costTable[i][j] = 6;
+                    costTable[i][j] = 30;
                 }
             }
         }
@@ -262,7 +297,7 @@ public class AStarCorridors
             {
                 if (j == sourceRoom.beginX || j == sourceRoom.beginX + sourceRoom.sizeX - 1 || i == sourceRoom.beginY || i == sourceRoom.beginY + sourceRoom.sizeY - 1)
                 {
-                    costTable[i][j] = 10;
+                    costTable[i][j] = 90;
                 }
                 else
                 {
@@ -277,7 +312,7 @@ public class AStarCorridors
             {
                 if (j == targetRoom.beginX || j == targetRoom.beginX + targetRoom.sizeX - 1 || i == targetRoom.beginY || i == targetRoom.beginY + targetRoom.sizeY - 1)
                 {
-                    costTable[i][j] = 10;
+                    costTable[i][j] = 90;
                 }
                 else
                 {

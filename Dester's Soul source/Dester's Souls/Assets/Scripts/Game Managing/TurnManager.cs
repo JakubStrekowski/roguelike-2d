@@ -215,13 +215,13 @@ public class TurnManager : MonoBehaviour
                 columnAmmount = 10;
                 return mapGenerator.CreateDungeon(columnAmmount, rowAmmount, 40);
             case 4:
-                rowAmmount = 20;
-                columnAmmount = 20;
-                return mapGenerator.CreateDungeon(columnAmmount, rowAmmount, 200);
+                rowAmmount = 10;
+                columnAmmount = 10;
+                return mapGenerator.CreateDungeon(columnAmmount, rowAmmount, 60);
         }
         rowAmmount = 12;
         columnAmmount = 14;
-        return mapGenerator.CreateDungeon(columnAmmount, rowAmmount, 60); ;
+        return mapGenerator.CreateDungeon(columnAmmount, rowAmmount, 120); ;
     }
 
     public void RemoveEnemyFromList(Enemy enemy)
